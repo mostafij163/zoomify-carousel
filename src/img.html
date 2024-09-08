@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        padding: 0;
+        margin: 0;
+      }
+      img {
+        height: auto;
+        /* transform: translate(-152px, -149px); */
+      }
+    </style>
+  </head>
+
+  <body>
+    <img
+      style="display: block; user-select: none; -webkit-user-select: none; margin: auto"
+      src="https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&amp;w=700&amp;auto=format"
+      width="700"
+      height="466" />
+
+    <script>
+      const img = document.querySelector('img')
+      img.addEventListener('click', e => {
+        e.preventDefault()
+
+        console.log('mouse coordinates-> x, y: ', e.clientX, e.clientY)
+      })
+      /*
+        700px
+        flower coordinates-> x, y:  357 345
+        offset -> x, y: 0, 0
+
+        1000px
+        flower coordinates-> x, y:  509 494
+        offset -> x, y: 0, 0
+
+        transform-> x, y: (357-509 = -152), (345-494 = -149)
+      */
+    </script>
+  </body>
+</html>

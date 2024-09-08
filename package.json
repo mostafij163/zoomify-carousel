@@ -9,7 +9,8 @@
     "react-dom": "^18.1.0",
     "react-merge-refs": "^2.1.1",
     "react-scripts": "^5.0.1",
-    "react-use-measure": "2.1.1"
+    "react-use-measure": "2.1.1",
+    "react-zoom-pan-pinch": "^3.6.1"
   },
   "devDependencies": {
     "@types/css-modules": "^1.0.5",

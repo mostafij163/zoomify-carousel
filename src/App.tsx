@@ -13,24 +13,23 @@ const DPR = devicePixelRatio || 1
 export default function App() {
   const contRef = React.useRef<HTMLDivElement>(null)
   const imgRef = React.useRef<HTMLImageElement>(null)
-  const [measureRef, bounds] = useMeasure()
 
   const [style, api] = useSpring(() => ({
     x: 0,
     y: 0,
-    scale: 1,
+    width: 700,
     rotateZ: 0,
     transformOrigin: 'center',
     config: config.stiff,
   }))
 
-  useLayoutEffect(() => {
-    const imgWidth = Math.ceil(bounds.width * DPR)
+  // useLayoutEffect(() => {
+  //   const imgWidth = Math.ceil(bounds.width * DPR)
 
-    if (imgRef.current) {
-      imgRef.current.src = `https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&w=${imgWidth}&auto=format`
-    }
-  }, [imgRef, bounds])
+  //   if (imgRef.current) {
+  //     imgRef.current.src = `https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&w=${imgWidth}&auto=format`
+  //   }
+  // }, [imgRef, bounds])
 
   useEffect(() => {
     const handler = (e: Event) => e.preventDefault()
@@ -47,23 +46,35 @@ export default function App() {
   const gestures = useGesture(
     {
       onPinch: ({ origin: [ox, oy], first, movement: [ms], offset: [s, a], memo }) => {
-        if (first) {
-          const { width, x, y } = bounds
+        const rect = contRef.current?.getBoundingClientRect()
 
-          const tx = ox - (x + width / 2)
-          const ty = oy - (y + width / 2)
+        if (first && rect) {
+          const tx = ox - rect.left
+          const ty = oy - rect.top
 
-          memo = [style.x.get(), style.y.get(), tx, ty]
+          memo = {
+            tx,
+            ty,
+            x: style.x.get(),
+            y: style.y.get(),
+            width: rect.width,
+          }
         }
 
-        const xoffset = memo[0] - (ms - 1) * memo[2]
-        const yoffset = memo[1] - (ms - 1) * memo[3]
+        if (memo) {
+          const newWidth = memo.width * s
 
-        api.start({ scale: s, rotateZ: a, x: xoffset, y: yoffset })
+          const deltaX = memo.tx * (s - 1)
+          const deltaY = memo.ty * (s - 1)
+
+          api.start({ width: newWidth, x: memo.x - deltaX, y: memo.y - deltaY })
+        }
+
         return memo
       },
       onPinchEnd: ({ offset: [s] }) => {
-        const imgWidth = Math.ceil(bounds.width * s * DPR)
+        const rect = contRef.current!.getBoundingClientRect()
+        const imgWidth = Math.ceil(rect.width * DPR)
 
         imgRef.current!.src = `https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&w=${imgWidth}&auto=format`
       },
@@ -87,16 +98,12 @@ export default function App() {
   )
 
   return (
-    <animated.div
-      {...gestures()}
-      className={`flex center ${styles.container}`}
-      ref={mergeRefs([contRef, measureRef])}
-      style={{ ...style }}>
+    <animated.div {...gestures()} className={`flex center ${styles.container}`} ref={contRef} style={{ ...style }}>
       <animated.img
         ref={imgRef}
         alt="Zoomable"
         className={styles.image}
-        src="https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&w=749&auto=format"
+        src="https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&w=825&auto=format"
         onDragStart={e => e.preventDefault()}
       />
     </animated.div>
