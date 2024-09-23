@@ -11,18 +11,30 @@
         margin: 0;
       }
       img {
+        width: 100%;
         height: auto;
-        /* transform: translate(-152px, -149px); */
+      }
+      .container {
+        width: 100vw;
+        position: relative;
+        overflow: hidden;
       }
     </style>
   </head>
 
   <body>
-    <img
-      style="display: block; user-select: none; -webkit-user-select: none; margin: auto"
-      src="https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&amp;w=700&amp;auto=format"
-      width="700"
-      height="466" />
+    <div class="container">
+      <img
+        style="display: block; user-select: none; -webkit-user-select: none; margin: auto"
+        src="https://images.unsplash.com/photo-1716097782146-9b17e82103c3?q=80&w=1050&auto=format"
+        width="700"
+        height="466" />
+      <!-- <img
+        style="display: block; user-select: none; -webkit-user-select: none; margin: auto"
+        src="https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&amp;w=700&amp;auto=format"
+        width="700"
+        height="466" /> -->
+    </div>
 
     <script>
       const img = document.querySelector('img')
