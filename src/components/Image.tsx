@@ -2,17 +2,28 @@ import { useRef } from 'react'
 import { animated } from '@react-spring/web'
 import { createUseGesture, dragAction, pinchAction, UserGestureConfig, wheelAction } from '@use-gesture/react'
 
-import { measureContainedImgWidth, resizeImageWidth, useImageDrag } from '../utils'
-import styles from './../styles.module.css'
 import { ImageProps, PinchMemo } from '../types/types'
+import { measureContainedImgWidth, resizeImageWidth, useImageDrag } from '../utils'
+import useMeasure from 'react-use-measure'
+import { mergeRefs } from 'react-merge-refs'
 
 const useGesture = createUseGesture([dragAction, pinchAction, wheelAction])
 
-export default function Image({ id, src, bodyRect, style, api, totalImgCount }: ImageProps) {
+export default function Image({
+  id,
+  heightOffset,
+  src,
+  bodyRect,
+  style,
+  springApi,
+  totalImgCount,
+  setIndex,
+}: ImageProps) {
   const imgRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [ref, rect] = useMeasure({ offsetSize: true })
 
-  const onDrag = useImageDrag(id, containerRef, api, totalImgCount, bodyRect.width)
+  const onDrag = useImageDrag({ id, containerRef, springApi, totalImgCount, bodyWidth: bodyRect.width, setIndex })
 
   const config: UserGestureConfig = {
     target: containerRef,
@@ -23,7 +34,6 @@ export default function Image({ id, src, bodyRect, style, api, totalImgCount }: 
       scaleBounds: { min: 1, max: 10 },
     },
     drag: {
-      delay: 200,
       pointer: {
         capture: false,
         keys: true,
@@ -38,7 +48,7 @@ export default function Image({ id, src, bodyRect, style, api, totalImgCount }: 
   useGesture(
     {
       onPinch: ({ down, origin: [ox, oy], first, movement: [ms], offset: [s], memo }) => {
-        const { width, top, left } = containerRef.current!.getBoundingClientRect()
+        const { width, top, left } = rect
 
         let pinchMemo = memo as PinchMemo
 
@@ -49,15 +59,15 @@ export default function Image({ id, src, bodyRect, style, api, totalImgCount }: 
             y: style.y.get(),
             tx: ox - left,
             ty: oy - top,
-            initialWidth: measureContainedImgWidth(
-              { width: bodyRect.width, height: bodyRect.height },
-              style.aspectRatio.get()
-            ),
           }
         }
 
         if (pinchMemo) {
-          const newWidth = pinchMemo.initialWidth * s
+          const initialWidth = measureContainedImgWidth(
+            { width: bodyRect.width, height: bodyRect.height - heightOffset },
+            style.aspectRatio.get()
+          )
+          const newWidth = initialWidth * s
 
           const deltaX = pinchMemo.tx * (ms - 1)
           const deltaY = pinchMemo.ty * (ms - 1)
@@ -65,8 +75,9 @@ export default function Image({ id, src, bodyRect, style, api, totalImgCount }: 
           let x = pinchMemo.x - deltaX,
             y = pinchMemo.y - deltaY
 
-          api.start(i => {
+          springApi.start(i => {
             if (i !== id) return
+
             return {
               x,
               y,
@@ -79,11 +90,9 @@ export default function Image({ id, src, bodyRect, style, api, totalImgCount }: 
       },
       onPinchEnd: () => {
         if (imgRef.current) {
-          const { width, height } = containerRef.current!.getBoundingClientRect()
+          const { width } = containerRef.current!.getBoundingClientRect()
 
-          const containerWidth = measureContainedImgWidth({ height, width }, style.aspectRatio.get())
-
-          const newSrc = resizeImageWidth(imgRef.current.src, containerWidth)
+          const newSrc = resizeImageWidth(imgRef.current.src, width)
 
           imgRef.current.src = newSrc
         }
@@ -93,17 +102,11 @@ export default function Image({ id, src, bodyRect, style, api, totalImgCount }: 
     config
   )
 
-  // useEffect(() => {
-  //   const url = new URL(src)
-  //   url.searchParams.set('w', `${calcImgWidth(viewportWidth)}`)
-
-  //   if (imgRef.current) {
-  //     imgRef.current.src = url.toString()
-  //   }
-  // }, [imgRef, src])
-
   return (
-    <animated.div style={style} className={`flex center ${styles.container}`} ref={containerRef}>
+    <animated.div
+      style={style}
+      className="absolute cursor-grab select-none will-change-transform touch-none"
+      ref={mergeRefs([containerRef, ref])}>
       <animated.img style={{ width: style.width }} ref={imgRef} alt="Zoomable" src={src} />
     </animated.div>
   )

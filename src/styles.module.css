@@ -10,18 +10,6 @@ body {
   position: relative;
 }
 
-.container {
-  top: 0;
-  left: 0;
-  position: absolute;
-  cursor: grab;
-  overflow: hidden;
-  user-select: none;
-  touch-action: none;
-  background: #000;
-  will-change: transform;
-}
-
 .container img {
   width: 100%;
   height: auto;

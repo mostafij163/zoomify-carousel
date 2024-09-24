@@ -8,7 +8,7 @@ export type PinchMemo = {
   ty: number
   x: number
   y: number
-  initialWidth: number
+  // initialWidth: number
 }
 
 export type DragGesture = {
@@ -26,7 +26,7 @@ export type ImageSpringProps = {
   width: number
   aspectRatio: number
   config?: SpringConfig
-}
+} & Pick<CSSProperties, 'position'>
 
 export type ImageSpring = SpringValues<ImageSpringProps & CSSProperties>
 
@@ -35,8 +35,10 @@ export type Rect = Omit<DOMRect, 'toJSON'>
 export type ImageProps = Pick<HTMLElement & HTMLImageElement, 'src'> & {
   id: number
   totalImgCount: number
+  heightOffset: number
+  setIndex: (index: number) => void
   style: ImageSpring
-  api: SpringRef<ImageSpringProps>
+  springApi: SpringRef<ImageSpringProps>
   bodyRect: Rect
 } & Partial<Pick<HTMLImageElement, 'srcset' | 'sizes' | 'width' | 'height'>>
 

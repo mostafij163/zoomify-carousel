@@ -10,7 +10,7 @@ export const calcImgWidth = (containerWidth: number) => {
 
 /*calculate container width maintaining image aspect ratio */
 export function measureContainedImgWidth(container: { height: number; width: number }, imgAspectRatio: number): number {
-  return Math.ceil(imgAspectRatio > 1 ? container.width : container.height * imgAspectRatio)
+  return Number((imgAspectRatio > 1 ? container.width : container.height * imgAspectRatio).toFixed(3))
 }
 
 /*resize image width based on container size*/
@@ -21,13 +21,21 @@ export function resizeImageWidth(imgUrl: string, containerWidth: number): string
   return url.toString()
 }
 
-export function useImageDrag(
-  id: number,
-  containerRef: RefObject<HTMLDivElement>,
-  springApi: SpringRef<ImageSpringProps>,
-  totalImgCount: number,
-  initialWidth: number
-) {
+export function useImageDrag({
+  id,
+  totalImgCount,
+  containerRef,
+  bodyWidth,
+  springApi,
+  setIndex,
+}: {
+  id: number
+  containerRef: RefObject<HTMLDivElement>
+  springApi: SpringRef<ImageSpringProps>
+  totalImgCount: number
+  bodyWidth: number
+  setIndex: (index: number) => void
+}) {
   const onDrag: Handler<'drag'> = useCallback(
     function onDrag({ pinching, down, cancel, offset: [x, y], velocity: [xVel], direction: [xDir] }: DragGesture) {
       if (pinching) return cancel()
@@ -42,10 +50,11 @@ export function useImageDrag(
 
       springApi.start(i => {
         if (trigger && !down) {
+          const nextImage = dir === -1 ? prevId : nextId
           if (i === id) {
-            console.log(initialWidth, width)
-            return { x: width > initialWidth ? (width + 100) * dir : (initialWidth + 100) * dir, y: 0 }
-          } else if (i === (dir === -1 ? prevId : nextId)) {
+            return { x: width > bodyWidth ? (width + 100) * dir : (bodyWidth + 100) * dir, y: 0 }
+          } else if (i === nextImage) {
+            setIndex(nextImage)
             return { x: 0, y: 0 }
           } else return
         } else {
@@ -54,7 +63,7 @@ export function useImageDrag(
         }
       })
     },
-    [id, containerRef, springApi, totalImgCount, initialWidth]
+    [id, containerRef, springApi, totalImgCount, bodyWidth]
   )
 
   return onDrag
