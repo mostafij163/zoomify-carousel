@@ -7,8 +7,9 @@ import Image from './Image'
 import Sidebar from './Sidebar'
 import { images } from '../images'
 import { measureContainedImgWidth } from '../utils'
-import Toolbar from './Toolbar'
+import Bottombar from './Bottombar'
 import { Rect } from '../types/types'
+import Topbar from './Topbar'
 
 export default function Carousel() {
   const [bodyRef, bodyRect] = useMeasure()
@@ -70,10 +71,6 @@ export default function Carousel() {
     }
   }, [])
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen)
-  }
-
   const closeSidebar = () => {
     setIsSidebarOpen(false)
   }
@@ -82,36 +79,30 @@ export default function Carousel() {
     <div className="h-screen w-screen overflow-hidden">
       <div className="flex h-full">
         <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-        <div className="flex-1 relative">
-          <button
-            onClick={toggleSidebar}
-            className="absolute top-4 left-4 z-40 text-slate-500 hover:text-gray-600 focus:outline-none focus:text-gray-600 lg:hidden">
-            <Menu size={24} />
-          </button>
-          <div className="h-full w-full">
-            <div ref={bodyRef} className="bg-slate-900 w-full h-full relative">
-              {springs.map((spring, i) => (
-                <Image
-                  key={i}
-                  id={i}
-                  springApi={api}
-                  bodyRect={bodyRect}
-                  src={images[i].src}
-                  style={{ ...spring }}
-                  totalImgCount={images.length}
-                  setIndex={setCurrentIndex}
-                  heightOffset={heightOffset}
-                />
-              ))}
-            </div>
-            <Toolbar
-              currentIndex={currentIndex}
-              total={images.length}
-              springApi={api}
-              ref={toolbarRef}
-              setIndex={setCurrentIndex}
-            />
+        <div className="flex-1 bg-slate-900 ">
+          <Topbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+          <div ref={bodyRef} className="w-full h-full relative">
+            {springs.map((spring, i) => (
+              <Image
+                key={i}
+                id={i}
+                springApi={api}
+                bodyRect={bodyRect}
+                src={images[i].src}
+                style={{ ...spring }}
+                totalImgCount={images.length}
+                setIndex={setCurrentIndex}
+                heightOffset={heightOffset}
+              />
+            ))}
           </div>
+          <Bottombar
+            currentIndex={currentIndex}
+            total={images.length}
+            springApi={api}
+            ref={toolbarRef}
+            setIndex={setCurrentIndex}
+          />
         </div>
       </div>
     </div>

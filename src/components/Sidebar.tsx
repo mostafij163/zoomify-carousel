@@ -8,7 +8,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:relative lg:translate-x-0`}>
       <div className="flex justify-between items-center p-4 lg:hidden">
-        <button onClick={onClose} className="text-white">
+        <button onClick={onClose} className="text-slate-700 hover:text-slate-900">
           <X size={24} />
         </button>
       </div>

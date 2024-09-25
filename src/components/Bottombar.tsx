@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { ImageSpringProps } from '../types/types'
 
-const Toolbar = forwardRef(function Toolbar(
+const Bottombar = forwardRef(function Bottombar(
   {
     currentIndex,
     total,
@@ -35,7 +35,7 @@ const Toolbar = forwardRef(function Toolbar(
   return (
     <div
       ref={toolbarRef}
-      className="p-4 flex gap-4 bg-slate-900 absolute bottom-0 left-0 w-full text-slate-200 justify-end items-center">
+      className="p-4 flex gap-4 bg-inherit absolute bottom-0 left-0 w-full text-slate-200 justify-end items-center">
       <div className="flex gap-2 text-lg">
         <span>{currentIndex}</span>
         <span>/</span>
@@ -51,4 +51,4 @@ const Toolbar = forwardRef(function Toolbar(
   )
 })
 
-export default Toolbar
+export default Bottombar
