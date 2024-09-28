@@ -12,45 +12,49 @@ import useImgPinchEnd from '../hooks/useImgPinchEnd'
 const useGesture = createUseGesture([dragAction, pinchAction, wheelAction])
 
 export default function Image({ id, src, style }: ImageProps) {
+  // const { bodyRect } = useCarousel()
   const imgRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const { bodyRect } = useCarousel()
-  const containedImgWidth = useRef<number>(
-    measureContainedImgWidth({ width: bodyRect!.width, height: bodyRect!.height }, style.aspectRatio.get())
-  )
 
-  const onDrag = useImgDrag({ id, containerRef })
-  const onPinch = useImgPinch({ id, containerRef, containedImgWidth: containedImgWidth.current, style })
-  const onPinchEnd = useImgPinchEnd({ imgRef, containerRef })
+  // console.log('style: ', style.width.get())
 
-  const config: UserGestureConfig = {
-    target: containerRef,
-    eventOptions: { passive: false },
-    pinch: {
-      modifierKey: null,
-      rubberband: false,
-      scaleBounds: { min: 1, max: 10 },
-    },
-    drag: {
-      pointer: {
-        capture: false,
-        keys: true,
-        lock: true,
-      },
-      rubberband: false,
-      preventDefault: true,
-      from: () => [style.x.get(), style.y.get()],
-    },
-  }
+  // const containedImgWidth = useRef<number>(
+  //   measureContainedImgWidth({ width: bodyRect!.width, height: bodyRect!.height }, style.aspectRatio.get())
+  // )
 
-  useGesture(
-    {
-      onPinch,
-      onPinchEnd,
-      onDrag,
-    },
-    config
-  )
+  // const onDrag = useImgDrag({ id, containerRef })
+  // const onPinch = useImgPinch({ id, containerRef, containedImgWidth: containedImgWidth.current, style })
+
+  // const onPinchEnd = useImgPinchEnd({ imgRef, containerRef })
+
+  // const config: UserGestureConfig = {
+  //   target: containerRef,
+  //   eventOptions: { passive: false },
+  //   pinch: {
+  //     modifierKey: null,
+  //     rubberband: false,
+  //     scaleBounds: { min: 1, max: 10 },
+  //   },
+  //   drag: {
+  //     pointer: {
+  //       capture: false,
+  //       keys: true,
+  //       lock: true,
+  //     },
+  //     rubberband: false,
+  //     preventDefault: true,
+  //     from: () => [style.x.get(), style.y.get()],
+  //   },
+  // }
+
+  // useGesture(
+  //   {
+  //     onPinch,
+  //     onPinchEnd,
+  //     onDrag,
+  //   },
+  //   config
+  // )
 
   return (
     <animated.div

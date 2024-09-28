@@ -1,12 +1,12 @@
-import { SpringRef } from '@react-spring/web'
+import { useLayoutEffect } from 'react'
+import useMeasure from 'react-use-measure'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { forwardRef, Ref, useImperativeHandle, useLayoutEffect, useRef } from 'react'
-import { ImageSpringProps, Rect, setRect } from '../types/types'
+
+import { setRect } from '../types/types'
 import useCarousel from '../context/Carousel'
 import ToolbarIcnBtn from './ToolbarIcnBtn'
-import useMeasure from 'react-use-measure'
 
-const Bottombar = forwardRef(function Bottombar({ setRect }: { setRect: setRect }) {
+export default function Bottombar({ setRect }: { setRect: setRect }) {
   const [bottombarRef, bottombarRect] = useMeasure()
   const { springApi, totalImages, currentIndex, setCurrentIndex } = useCarousel()
 
@@ -47,6 +47,4 @@ const Bottombar = forwardRef(function Bottombar({ setRect }: { setRect: setRect 
       </div>
     </div>
   )
-})
-
-export default Bottombar
+}

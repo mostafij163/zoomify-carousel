@@ -5,7 +5,7 @@ import { ClassValue } from 'clsx'
 
 export type Images = {
   src: string
-  'aspect-ratio': number
+  aspectRatio: number
 }[]
 
 export type PinchMemo = {
@@ -14,7 +14,6 @@ export type PinchMemo = {
   ty: number
   x: number
   y: number
-  // initialWidth: number
 }
 
 export type DragGesture = {
@@ -29,13 +28,14 @@ export type DragGesture = {
 export type ImageSpringProps = {
   x: number
   y: number
+  src: string
   width: number
   height: number
   aspectRatio: number
   config?: SpringConfig
 }
 
-export type ImageSpring = SpringValues<ImageSpringProps & CSSProperties>
+export type ImageSpring = SpringValues<Omit<ImageSpringProps, 'src'> & CSSProperties>
 
 export type Rect = Omit<DOMRect, 'toJSON'>
 

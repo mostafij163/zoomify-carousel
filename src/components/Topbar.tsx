@@ -1,11 +1,12 @@
+import { useLayoutEffect } from 'react'
+import useMeasure from 'react-use-measure'
 import { Maximize2, Menu } from 'lucide-react'
-import { forwardRef, useLayoutEffect } from 'react'
-import { Rect, setRect } from '../types/types'
+
+import { setRect } from '../types/types'
 import useCarousel from '../context/Carousel'
 import ToolbarIcnBtn from './ToolbarIcnBtn'
-import useMeasure from 'react-use-measure'
 
-const Topbar = forwardRef(function Topbar({
+export default function Topbar({
   setIsOpen,
   setRect,
 }: {
@@ -35,6 +36,4 @@ const Topbar = forwardRef(function Topbar({
       </div>
     </div>
   )
-})
-
-export default Topbar
+}

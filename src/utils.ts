@@ -7,12 +7,10 @@ export const calcImgWidth = (width: number) => {
 
 /*calculate image width maintaining image aspect ratio */
 export function measureContainedImgWidth(
-  { width, height }: { height: number; width: number },
+  { width, height }: { width: number; height: number },
   apsectRatio: number
-): number {
-  const imgWidth = Math.min(width, Number((apsectRatio > width / height ? width : height * apsectRatio).toFixed(3)))
-
-  return imgWidth
+): [number, number] {
+  return apsectRatio > width / height ? [width, width / apsectRatio] : [height * apsectRatio, height]
 }
 
 /*resize image width based on container size*/
