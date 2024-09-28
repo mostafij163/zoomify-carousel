@@ -1,24 +1,20 @@
 import { SpringRef } from '@react-spring/web'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { forwardRef, useImperativeHandle, useRef } from 'react'
-import { ImageSpringProps } from '../types/types'
+import { forwardRef, Ref, useImperativeHandle, useLayoutEffect, useRef } from 'react'
+import { ImageSpringProps, Rect, setRect } from '../types/types'
+import useCarousel from '../context/Carousel'
+import ToolbarIcnBtn from './ToolbarIcnBtn'
+import useMeasure from 'react-use-measure'
 
-const Bottombar = forwardRef(function Bottombar(
-  {
-    currentIndex,
-    total,
-    springApi,
-    setIndex,
-  }: { currentIndex: number; total: number; springApi: SpringRef<ImageSpringProps>; setIndex: (index: number) => void },
-  ref
-) {
-  const toolbarRef = useRef<HTMLDivElement>(null)
+const Bottombar = forwardRef(function Bottombar({ setRect }: { setRect: setRect }) {
+  const [bottombarRef, bottombarRect] = useMeasure()
+  const { springApi, totalImages, currentIndex, setCurrentIndex } = useCarousel()
 
-  useImperativeHandle(ref, () => ({ rect: toolbarRef.current?.getBoundingClientRect() }), [])
+  useLayoutEffect(() => setRect(bottombarRect), [bottombarRect])
 
   function onClick(dir: 1 | -1) {
-    const prevId = currentIndex === 0 ? total - 1 : currentIndex - 1
-    const nextId = currentIndex === total - 1 ? 0 : currentIndex + 1
+    const prevId = currentIndex === 0 ? totalImages - 1 : currentIndex - 1
+    const nextId = currentIndex === totalImages - 1 ? 0 : currentIndex + 1
 
     springApi.start(i => {
       const nextImage = dir === -1 ? nextId : prevId
@@ -26,7 +22,7 @@ const Bottombar = forwardRef(function Bottombar(
       if (i === currentIndex) {
         return { x: -5000 * dir, y: 0 }
       } else if (i === nextImage) {
-        setIndex(nextImage)
+        setCurrentIndex(nextImage)
         return { x: 0, y: 0 }
       } else return
     })
@@ -34,19 +30,21 @@ const Bottombar = forwardRef(function Bottombar(
 
   return (
     <div
-      ref={toolbarRef}
-      className="p-4 flex gap-4 bg-inherit absolute bottom-0 left-0 w-full text-slate-200 justify-end items-center">
-      <div className="flex gap-2 text-lg">
-        <span>{currentIndex}</span>
+      ref={bottombarRef}
+      className="p-4 flex gap-8 bg-inherit absolute bottom-0 left-0 z-40 w-full text-slate-100 justify-end items-center text-lg">
+      <div className="flex gap-2">
+        <span>{currentIndex + 1}</span>
         <span>/</span>
-        <span>{total}</span>
+        <span className="text-slate-400">{totalImages}</span>
       </div>
-      <button>
-        <ChevronLeft onClick={() => onClick(1)} />
-      </button>
-      <button>
-        <ChevronRight onClick={() => onClick(-1)} />
-      </button>
+      <div className="flex justify-center items-center gap-2">
+        <ToolbarIcnBtn>
+          <ChevronLeft className="w-[1.5em] h-[1.5em]" onClick={() => onClick(1)} />
+        </ToolbarIcnBtn>
+        <ToolbarIcnBtn>
+          <ChevronRight className="w-[1.5em] h-[1.5em]" onClick={() => onClick(-1)} />
+        </ToolbarIcnBtn>
+      </div>
     </div>
   )
 })

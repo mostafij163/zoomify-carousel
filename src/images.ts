@@ -1,7 +1,4 @@
-type Images = {
-  src: string
-  'aspect-ratio': number
-}[]
+import { Images } from './types/types'
 
 export const images: Images = [
   {
@@ -14,6 +11,7 @@ export const images: Images = [
   },
   {
     src: 'https://images.unsplash.com/photo-1597354641938-b44d2bc962ee?q=100&w=1050&auto=format',
-    'aspect-ratio': 1.333,
+    // 'aspect-ratio': 1.333,
+    'aspect-ratio': 0.5,
   },
 ]

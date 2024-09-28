@@ -1,52 +1,88 @@
-import { Menu } from 'lucide-react'
 import useMeasure from 'react-use-measure'
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { SpringConfig, useSprings } from '@react-spring/web'
+import { animated, SpringConfig, useSprings } from '@react-spring/web'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import Image from './Image'
-import Sidebar from './Sidebar'
-import { images } from '../images'
-import { measureContainedImgWidth } from '../utils'
-import Bottombar from './Bottombar'
-import { Rect } from '../types/types'
 import Topbar from './Topbar'
+import Sidebar from './Sidebar'
+import Bottombar from './Bottombar'
+import { Images, ImageSpringProps, Rect } from '../types/types'
+import { CarouselContext } from '../context/Carousel'
+import { getNextSlideIndex, measureContainedImgWidth, resizeImage } from '../utils'
+import useCallbackRef from '../hooks/useCallbackRef'
 
-export default function Carousel() {
+const config: SpringConfig = {
+  precision: 0.001,
+  duration: 0,
+}
+
+const bgColors = ['red', 'green', 'blue']
+
+export default function Carousel({ images }: { images: Images }) {
   const [bodyRef, bodyRect] = useMeasure()
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const containedImages = useRef<Images>([])
+  const currentIndex = useRef<number>(1)
+  const offset = useRef<{ top: number; bottom: number }>()
+  const [topbarRect, setTopbarRect] = useState<Rect>({
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+    bottom: 0,
+    right: 0,
+    x: 0,
+    y: 0,
+  })
+  const [bottombarRect, setBottombarRect] = useState<Rect>({
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+    bottom: 0,
+    right: 0,
+    x: 0,
+    y: 0,
+  })
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const toolbarRef = useRef<{ rect: Rect }>(null)
-  const [heightOffset, setHeightOffset] = useState(0)
 
   const [springs, api] = useSprings(
-    images.length,
+    3,
     i => {
-      const config: SpringConfig = {
-        precision: 0.0001,
-      }
+      const imgIdx = i + currentIndex.current - 1
+      const dir = imgIdx - currentIndex.current
+      const nextSlideIdx = getNextSlideIndex(currentIndex.current, dir, images.length)
 
-      const img = images[i]
+      const img = images[nextSlideIdx]
 
-      const containerWidth = measureContainedImgWidth(
+      const heightOffset = topbarRect.height + bottombarRect.height
+
+      const width = measureContainedImgWidth(
         { width: bodyRect.width, height: bodyRect.height - heightOffset },
         img['aspect-ratio']
       )
 
-      const values = {
+      const resizedSrc = resizeImage(img.src, width)
+
+      containedImages.current.push({ src: resizedSrc, 'aspect-ratio': img['aspect-ratio'] })
+
+      const values: ImageSpringProps = {
+        width,
+        height: width * img['aspect-ratio'],
         y: 0,
-        x: -bodyRect.x - bodyRect.width,
-        width: containerWidth,
+        x: bodyRect.width * dir,
         aspectRatio: img['aspect-ratio'],
         config,
       }
 
-      if (i === 0) {
-        values.x = (bodyRect.width - containerWidth) / 2
+      if (i === currentIndex.current) {
+        values.x = (bodyRect.width - width) / 2
+        values.y = (bodyRect.height - width * img['aspect-ratio']) / 2
       }
 
       return values
     },
-    [bodyRect, heightOffset]
+    [bodyRect, topbarRect, bottombarRect]
   )
 
   useEffect(() => {
@@ -61,50 +97,52 @@ export default function Carousel() {
     }
   }, [])
 
-  useLayoutEffect(() => {
-    if (toolbarRef.current) {
-      setHeightOffset(toolbarRef.current.rect.height)
-    }
-
-    return () => {
-      setHeightOffset(0)
-    }
-  }, [])
-
-  const closeSidebar = () => {
+  const closeSidebar = useCallbackRef(function closeSidebar() {
     setIsSidebarOpen(false)
-  }
+  })
+
+  const setCurrentIndex = useCallbackRef(function setCurrentIndex(index: number) {
+    currentIndex.current = index
+  })
+
+  const topbarCallback = useCallbackRef((rect: Rect) => {
+    setTopbarRect(rect)
+  })
+
+  const bottombarCallback = useCallbackRef((rect: Rect) => {
+    setBottombarRect(rect)
+  })
 
   return (
-    <div className="h-screen w-screen overflow-hidden">
-      <div className="flex h-full">
-        <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-        <div className="flex-1 bg-slate-900 ">
-          <Topbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-          <div ref={bodyRef} className="w-full h-full relative">
-            {springs.map((spring, i) => (
-              <Image
-                key={i}
-                id={i}
-                springApi={api}
-                bodyRect={bodyRect}
-                src={images[i].src}
-                style={{ ...spring }}
-                totalImgCount={images.length}
-                setIndex={setCurrentIndex}
-                heightOffset={heightOffset}
-              />
-            ))}
+    <CarouselContext.Provider
+      value={{
+        bodyRect,
+        offset: offset.current,
+        totalImages: images.length,
+        currentIndex: currentIndex.current,
+        setCurrentIndex,
+        springApi: api,
+      }}>
+      <div className="h-screen w-screen overflow-hidden">
+        <div className="flex h-full">
+          <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+          <div className="flex-1 bg-slate-900 relative h-full w-full">
+            <Topbar setIsOpen={setIsSidebarOpen} setRect={topbarCallback} />
+            <div ref={bodyRef} className="w-full h-full relative">
+              {springs.map((spring, i) => (
+                <animated.div
+                  key={i}
+                  style={{ ...spring, backgroundColor: bgColors[i] }}
+                  className="h-full text-3xl bg-red-500 absolute cursor-grab select-none will-change-transform touch-none conten">
+                  Box {i}
+                </animated.div>
+                // <Image key={i} id={i} src={containedImages.current[i].src} style={{ ...spring }} />
+              ))}
+            </div>
+            <Bottombar setRect={bottombarCallback} />
           </div>
-          <Bottombar
-            currentIndex={currentIndex}
-            total={images.length}
-            springApi={api}
-            ref={toolbarRef}
-            setIndex={setCurrentIndex}
-          />
         </div>
       </div>
-    </div>
+    </CarouselContext.Provider>
   )
 }

@@ -1,27 +1,40 @@
 import { Maximize2, Menu } from 'lucide-react'
+import { forwardRef, useLayoutEffect } from 'react'
+import { Rect, setRect } from '../types/types'
+import useCarousel from '../context/Carousel'
+import ToolbarIcnBtn from './ToolbarIcnBtn'
+import useMeasure from 'react-use-measure'
 
-export default function Topbar({
-  isSidebarOpen,
-  setIsSidebarOpen,
+const Topbar = forwardRef(function Topbar({
+  setIsOpen,
+  setRect,
 }: {
-  isSidebarOpen: boolean
-  setIsSidebarOpen: (isSidebarOpen: boolean) => void
+  isOpen?: boolean
+  setRect: setRect
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
 }) {
+  const [topbarRef, topbarRect] = useMeasure()
+
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen)
+    setIsOpen((isOpen: boolean) => !isOpen)
   }
+
+  useLayoutEffect(() => setRect(topbarRect), [topbarRect])
+
   return (
-    <div className="p-4 bg-inherit flex gap-4 justify-between items-center text-slate-200 relative">
-      <button
-        onClick={toggleSidebar}
-        className="hover:text-slate-400 focus:outline-none focus:text-slate-400 lg:hidden">
+    <div
+      className="absolute z-40 w-full p-4 bg-inherit flex gap-4 justify-between items-center text-slate-200"
+      ref={topbarRef}>
+      <ToolbarIcnBtn onClick={toggleSidebar} className="lg:hidden">
         <Menu size={24} />
-      </button>
+      </ToolbarIcnBtn>
       <div className="lg:ml-auto">
-        <button className=" hover:text-slate-400 focus:outline-none focus:text-slate-400">
+        <ToolbarIcnBtn>
           <Maximize2 size={24} />
-        </button>
+        </ToolbarIcnBtn>
       </div>
     </div>
   )
-}
+})
+
+export default Topbar

@@ -10,50 +10,53 @@
         padding: 0;
         margin: 0;
       }
+      body {
+        display: flex;
+      }
       img {
-        width: 100%;
-        height: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1200px;
+        height: 2000px;
+        object-fit: cover;
+        /* transform: translateX(250px); */
       }
       .container {
-        width: 100vw;
+        position: relative;
+        background-color: red;
+        width: 800px;
+        height: 800px;
         position: relative;
         overflow: hidden;
+      }
+      .sidebar {
+        background-color: aquamarine;
+        width: 200px;
       }
     </style>
   </head>
 
   <body>
+    <div class="sidebar"></div>
     <div class="container">
       <img
         style="display: block; user-select: none; -webkit-user-select: none; margin: auto"
-        src="https://images.unsplash.com/photo-1716097782146-9b17e82103c3?q=80&w=1050&auto=format"
-        width="700"
-        height="466" />
-      <!-- <img
-        style="display: block; user-select: none; -webkit-user-select: none; margin: auto"
-        src="https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?q=100&amp;w=700&amp;auto=format"
-        width="700"
-        height="466" /> -->
+        src="https://images.unsplash.com/photo-1716097782146-9b17e82103c3?q=80&w=500&auto=format"
+        width="500" />
     </div>
 
     <script>
+      const container = document.querySelector('.container')
+      const contRect = container.getBoundingClientRect()
+
       const img = document.querySelector('img')
-      img.addEventListener('click', e => {
-        e.preventDefault()
+      const imgRect = img.getBoundingClientRect()
 
-        console.log('mouse coordinates-> x, y: ', e.clientX, e.clientY)
-      })
-      /*
-        700px
-        flower coordinates-> x, y:  357 345
-        offset -> x, y: 0, 0
+      const x = `${(contRect.width - imgRect.width) / 2}px`
+      const y = ` ${(contRect.height - imgRect.height) / 2}px`
 
-        1000px
-        flower coordinates-> x, y:  509 494
-        offset -> x, y: 0, 0
-
-        transform-> x, y: (357-509 = -152), (345-494 = -149)
-      */
+      img.style.transform = `translate(${x}, ${y})`
     </script>
   </body>
 </html>

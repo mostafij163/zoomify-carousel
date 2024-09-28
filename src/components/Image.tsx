@@ -2,28 +2,26 @@ import { useRef } from 'react'
 import { animated } from '@react-spring/web'
 import { createUseGesture, dragAction, pinchAction, UserGestureConfig, wheelAction } from '@use-gesture/react'
 
-import { ImageProps, PinchMemo } from '../types/types'
-import { measureContainedImgWidth, resizeImageWidth, useImageDrag } from '../utils'
-import useMeasure from 'react-use-measure'
-import { mergeRefs } from 'react-merge-refs'
+import { ImageProps } from '../types/types'
+import useImgDrag from '../hooks/useImgDrag'
+import useCarousel from '../context/Carousel'
+import useImgPinch from '../hooks/useImgPinch'
+import { measureContainedImgWidth } from '../utils'
+import useImgPinchEnd from '../hooks/useImgPinchEnd'
 
 const useGesture = createUseGesture([dragAction, pinchAction, wheelAction])
 
-export default function Image({
-  id,
-  heightOffset,
-  src,
-  bodyRect,
-  style,
-  springApi,
-  totalImgCount,
-  setIndex,
-}: ImageProps) {
+export default function Image({ id, src, style }: ImageProps) {
   const imgRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [ref, rect] = useMeasure({ offsetSize: true })
+  const { bodyRect } = useCarousel()
+  const containedImgWidth = useRef<number>(
+    measureContainedImgWidth({ width: bodyRect!.width, height: bodyRect!.height }, style.aspectRatio.get())
+  )
 
-  const onDrag = useImageDrag({ id, containerRef, springApi, totalImgCount, bodyWidth: bodyRect.width, setIndex })
+  const onDrag = useImgDrag({ id, containerRef })
+  const onPinch = useImgPinch({ id, containerRef, containedImgWidth: containedImgWidth.current, style })
+  const onPinchEnd = useImgPinchEnd({ imgRef, containerRef })
 
   const config: UserGestureConfig = {
     target: containerRef,
@@ -47,56 +45,8 @@ export default function Image({
 
   useGesture(
     {
-      onPinch: ({ down, origin: [ox, oy], first, movement: [ms], offset: [s], memo }) => {
-        const { width, top, left } = rect
-
-        let pinchMemo = memo as PinchMemo
-
-        if (first) {
-          pinchMemo = {
-            width,
-            x: style.x.get(),
-            y: style.y.get(),
-            tx: ox - left,
-            ty: oy - top,
-          }
-        }
-
-        if (pinchMemo) {
-          const initialWidth = measureContainedImgWidth(
-            { width: bodyRect.width, height: bodyRect.height - heightOffset },
-            style.aspectRatio.get()
-          )
-          const newWidth = initialWidth * s
-
-          const deltaX = pinchMemo.tx * (ms - 1)
-          const deltaY = pinchMemo.ty * (ms - 1)
-
-          let x = pinchMemo.x - deltaX,
-            y = pinchMemo.y - deltaY
-
-          springApi.start(i => {
-            if (i !== id) return
-
-            return {
-              x,
-              y,
-              width: newWidth,
-              immediate: down,
-            }
-          })
-        }
-        return pinchMemo
-      },
-      onPinchEnd: () => {
-        if (imgRef.current) {
-          const { width } = containerRef.current!.getBoundingClientRect()
-
-          const newSrc = resizeImageWidth(imgRef.current.src, width)
-
-          imgRef.current.src = newSrc
-        }
-      },
+      onPinch,
+      onPinchEnd,
       onDrag,
     },
     config
@@ -105,9 +55,15 @@ export default function Image({
   return (
     <animated.div
       style={style}
-      className="absolute cursor-grab select-none will-change-transform touch-none"
-      ref={mergeRefs([containerRef, ref])}>
-      <animated.img style={{ width: style.width }} ref={imgRef} alt="Zoomable" src={src} />
+      ref={containerRef}
+      className="absolute cursor-grab select-none will-change-transform touch-none conten">
+      <animated.img
+        src={src}
+        ref={imgRef}
+        alt="Zoomable"
+        style={{ width: style.width }}
+        className="max-w-full max-h-full object-contain pointer-events-none image-rendering-auto"
+      />
     </animated.div>
   )
 }
