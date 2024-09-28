@@ -11,15 +11,15 @@ import useImgPinchEnd from '../hooks/useImgPinchEnd'
 
 const useGesture = createUseGesture([dragAction, pinchAction, wheelAction])
 
-export default function Image({ id, src, style }: ImageProps) {
-  // const { bodyRect } = useCarousel()
+export default function Image({ id, src, containedWidth, style }: ImageProps) {
+  const { bodyRect } = useCarousel()
   const imgRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // console.log('style: ', style.width.get())
+  console.log('style: ', containedWidth)
 
-  // const containedImgWidth = useRef<number>(
-  //   measureContainedImgWidth({ width: bodyRect!.width, height: bodyRect!.height }, style.aspectRatio.get())
+  // const containedImgWidth = useRef<[number, number]>(
+  //   measureContainedImgWidth({  }, style.aspectRatio.get())
   // )
 
   // const onDrag = useImgDrag({ id, containerRef })

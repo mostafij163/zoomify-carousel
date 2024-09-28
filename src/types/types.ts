@@ -28,20 +28,20 @@ export type DragGesture = {
 export type ImageSpringProps = {
   x: number
   y: number
-  src: string
   width: number
   height: number
   aspectRatio: number
   config?: SpringConfig
 }
 
-export type ImageSpring = SpringValues<Omit<ImageSpringProps, 'src'> & CSSProperties>
+export type ImageSpring = SpringValues<ImageSpringProps & CSSProperties>
 
 export type Rect = Omit<DOMRect, 'toJSON'>
 
 export type ImageProps = Pick<HTMLElement & HTMLImageElement, 'src'> & {
   id: number
   style: ImageSpring
+  containedWidth: number
 } & Partial<Pick<HTMLImageElement, 'srcset' | 'sizes' | 'width' | 'height'>>
 
 export type SidebarProps = {
@@ -51,9 +51,10 @@ export type SidebarProps = {
 
 export type CarouselContextType = {
   bodyRect: Rect
+  topbarRect: Rect
+  bottombarRect: Rect
   totalImages: number
   currentIndex: number
-  offset: { top: number; bottom: number } | undefined
   setCurrentIndex: (index: number) => void
   springApi: SpringRef<ImageSpringProps>
 }

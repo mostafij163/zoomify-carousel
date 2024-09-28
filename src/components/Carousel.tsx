@@ -8,7 +8,7 @@ import Sidebar from './Sidebar'
 import Bottombar from './Bottombar'
 import useCallbackRef from '../hooks/useCallbackRef'
 import { CarouselContext } from '../context/Carousel'
-import { Images, ImageSpringProps, Rect } from '../types/types'
+import { ImageProps, Images, ImageSpring, ImageSpringProps, Rect } from '../types/types'
 import { getNextSlideIndex, measureContainedImgWidth, resizeImage } from '../utils'
 
 const config: SpringConfig = {
@@ -19,7 +19,6 @@ const config: SpringConfig = {
 export default function Carousel({ images }: { images: Images }) {
   const [bodyRef, bodyRect] = useMeasure()
   const currentIndex = useRef<number>(0)
-  const offset = useRef<{ top: number; bottom: number }>()
   const [topbarRect, setTopbarRect] = useState<Rect>({
     left: 0,
     top: 0,
@@ -41,10 +40,28 @@ export default function Carousel({ images }: { images: Images }) {
     y: 0,
   })
 
-  const [containedImages, setContainedImages] = useState<ImageSpringProps[]>([])
+  const [containedImages, setContainedImages] = useState<
+    (ImageSpringProps & Pick<ImageProps, 'src' | 'containedWidth'>)[]
+  >([])
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const [springs, api] = useSprings(containedImages.length, i => containedImages[i], [containedImages])
+  const [springs, api] = useSprings(
+    containedImages.length,
+    i => {
+      const { width, height, x, y, aspectRatio, config } = containedImages[i]
+
+      return {
+        x,
+        y,
+        width,
+        height,
+        aspectRatio,
+        config,
+      }
+    },
+    [containedImages]
+  )
 
   useLayoutEffect(() => {
     if (bodyRect.width > 0) {
@@ -63,9 +80,10 @@ export default function Carousel({ images }: { images: Images }) {
           img.aspectRatio
         )
 
-        const values: ImageSpringProps = {
+        const values: ImageSpringProps & Pick<ImageProps, 'src' | 'containedWidth'> = {
           width,
           height: height,
+          containedWidth: width,
           aspectRatio: img.aspectRatio,
           src: resizeImage(img.src, width),
           y: 0,
@@ -113,13 +131,12 @@ export default function Carousel({ images }: { images: Images }) {
     setBottombarRect(rect)
   })
 
-  console.log(bodyRect.height - topbarRect.height - bottombarRect.height)
-
   return (
     <CarouselContext.Provider
       value={{
         bodyRect,
-        offset: offset.current,
+        topbarRect,
+        bottombarRect,
         totalImages: images.length,
         springApi: api,
         setCurrentIndex,
@@ -131,8 +148,14 @@ export default function Carousel({ images }: { images: Images }) {
           <div className="flex-1 bg-slate-900 relative h-full w-full">
             <Topbar setIsOpen={setIsSidebarOpen} setRect={topbarCallback} />
             <div ref={bodyRef} className="w-full h-full relative">
-              {springs.map(({ src, ...spring }, i) => (
-                <Image key={i} id={i} src={containedImages[i].src} style={{ ...spring }} />
+              {springs.map((spring, i) => (
+                <Image
+                  key={i}
+                  id={i}
+                  src={containedImages[i].src}
+                  containedWidth={containedImages[i].containedWidth}
+                  style={spring}
+                />
               ))}
             </div>
             <Bottombar setRect={bottombarCallback} />
