@@ -16,11 +16,9 @@ export default function Image({ index, src, containedWidth, style }: ImageProps)
   const containerRef = useRef<HTMLDivElement>(null)
   const [measureRef, containerRect] = useMeasure()
 
-  const onDrag = useImgDrag({ index, containerRect })
+  const onDrag = useImgDrag({ index, containedWidth, containerRect })
   const onPinch = useImgPinch({ index, containerRect, containedWidth, style })
   const onPinchEnd = useImgPinchEnd({ imgRef, containerRect })
-
-  // console.log('image component render count: ', ++renderCount)
 
   const config: UserGestureConfig = {
     target: containerRef,

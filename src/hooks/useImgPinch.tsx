@@ -35,7 +35,7 @@ export default function useImgPinch({
 
       if (pinchMemo) {
         const newWidth = containedWidth * s
-        if (newWidth <= containedWidth && !down) {
+        if (Math.floor(newWidth) <= Math.floor(containedWidth) && !down) {
           springApi.start(i => {
             if (i !== index) return
             return {
