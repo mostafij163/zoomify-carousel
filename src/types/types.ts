@@ -14,6 +14,8 @@ export type PinchMemo = {
   ty: number
   x: number
   y: number
+  // itx: number
+  // ity: number
 }
 
 export type DragGesture = {

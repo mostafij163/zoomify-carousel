@@ -5,8 +5,6 @@ import { springConfig1 } from '../constants'
 import useCarousel from '../context/Carousel'
 import { ImageSpring, PinchMemo, Rect } from '../types/types'
 
-//highlight: when zoom in too high and zoom out from corner the translation adjustment is not right
-
 export default function useImgPinch({
   index,
   style,
@@ -18,12 +16,11 @@ export default function useImgPinch({
   containedWidth: number
   containerRect: Rect
 }) {
-  const { springApi } = useCarousel()
+  const { springApi, bodyRect } = useCarousel()
 
   return useCallback<Handler<'pinch'>>(
-    function onPinch({ down, origin: [ox, oy], first, movement: [ms], offset: [s], memo }) {
+    function onPinch({ down, cancel, origin: [ox, oy], first, movement: [ms], offset: [s], memo }) {
       const { width, top, left } = containerRect
-
       let pinchMemo = memo as PinchMemo
 
       if (first) {
@@ -38,10 +35,21 @@ export default function useImgPinch({
 
       if (pinchMemo) {
         const newWidth = containedWidth * s
+        if (newWidth <= containedWidth && !down) {
+          springApi.start(i => {
+            if (i !== index) return
+            return {
+              width: containedWidth,
+              x: (bodyRect.width - containedWidth) / 2,
+              y: (bodyRect.height - containedWidth / style.aspectRatio.get()) / 2,
+            }
+          })
+          return cancel()
+        }
         const newHeight = newWidth / style.aspectRatio.get()
 
-        const deltaX = pinchMemo.tx * (ms - style.scale?.get())
-        const deltaY = pinchMemo.ty * (ms - style.scale?.get())
+        const deltaX = pinchMemo.tx * (ms - 1)
+        const deltaY = pinchMemo.ty * (ms - 1)
 
         let x = pinchMemo.x - deltaX,
           y = pinchMemo.y - deltaY

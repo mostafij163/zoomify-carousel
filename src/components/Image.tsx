@@ -11,8 +11,6 @@ import useImgPinchEnd from '../hooks/useImgPinchEnd'
 
 const useGesture = createUseGesture([dragAction, pinchAction, wheelAction])
 
-let renderCount = 0
-
 export default function Image({ index, src, containedWidth, style }: ImageProps) {
   const imgRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
