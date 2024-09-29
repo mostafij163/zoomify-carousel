@@ -26,10 +26,10 @@ export default function Topbar({
     <div
       className="absolute z-40 w-full p-4 bg-inherit flex gap-4 justify-between items-center text-slate-200"
       ref={topbarRef}>
-      <ToolbarIcnBtn onClick={toggleSidebar} className="lg:hidden">
+      <ToolbarIcnBtn onClick={toggleSidebar} className="hidden lg:hidden">
         <Menu size={24} />
       </ToolbarIcnBtn>
-      <div className="lg:ml-auto">
+      <div className="ml-auto lg:ml-auto">
         <ToolbarIcnBtn>
           <Maximize2 size={24} />
         </ToolbarIcnBtn>
