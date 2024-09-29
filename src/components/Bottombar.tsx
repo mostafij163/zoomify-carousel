@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { setRect } from '../types/types'
 import useCarousel from '../context/Carousel'
 import ToolbarIcnBtn from './ToolbarIcnBtn'
-import { getNextSlideIndex } from '../utils'
+import { getSlideIndex } from '../utils'
 
 export default function Bottombar({ setRect }: { setRect: setRect }) {
   const [bottombarRef, bottombarRect] = useMeasure()
@@ -14,10 +14,10 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
   useLayoutEffect(() => setRect(bottombarRect), [bottombarRect])
 
   function onSwipe(dir: 1 | -1) {
-    const nextSlideIdx = getNextSlideIndex(currentIndex, dir, totalImages)
+    const nextSlideIdx = getSlideIndex(currentIndex, dir, totalImages)
 
     springApi.start(i => {
-      const nextSpringIdx = getNextSlideIndex(currentIndex, i + dir, totalImages)
+      const nextSpringIdx = getSlideIndex(currentIndex, i + dir, totalImages)
 
       setCurrentIndex(nextSlideIdx)
 

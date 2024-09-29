@@ -25,6 +25,4 @@ export function mergeClasses(...classes: ClassValue[]): string {
   return twMerge(clsx(classes))
 }
 
-export function getNextSlideIndex(index: number, dir: number, length: number): number {
-  return (index + dir + length) % length
-}
+export const getSlideIndex = (i: number, dir: number, len: number) => (i + dir + len) % len

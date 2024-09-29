@@ -3,7 +3,7 @@ import { Handler } from '@use-gesture/react'
 
 import { Rect } from '../types/types'
 import useCarousel from '../context/Carousel'
-import { getNextSlideIndex } from '../utils'
+import { getSlideIndex } from '../utils'
 import { springConfig1 } from '../constants'
 
 export default function useImgDrag({
@@ -26,7 +26,7 @@ export default function useImgDrag({
       const trigger = xVel > 1 && dx > width - 100 && !down
       const dir = xDir < 0 ? 1 : -1
 
-      const nextSlideIdx = getNextSlideIndex(currentIndex, dir, totalImages)
+      const nextSlideIdx = getSlideIndex(currentIndex, dir, totalImages)
 
       if (trigger) {
         setCurrentIndex(nextSlideIdx)

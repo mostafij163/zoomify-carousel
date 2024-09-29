@@ -9,14 +9,14 @@ import Bottombar from './Bottombar'
 import useCallbackRef from '../hooks/useCallbackRef'
 import { CarouselContext } from '../context/Carousel'
 import { ContainedImage, Images, Rect } from '../types/types'
-import { getNextSlideIndex, measureContainedImgWidth, resizeImage } from '../utils'
+import { getSlideIndex, measureContainedImgWidth, resizeImage } from '../utils'
 
 const config: SpringConfig = {
   precision: 0.001,
   duration: 0,
 }
 
-export default function Carousel({ images, index }: { images: Images; index: number }) {
+export default function Carousel({ slides, index }: { slides: Images; index: number }) {
   const [bodyRef, bodyRect] = useMeasure()
   const [currentIndex, setIndex] = useState<number>(index)
   const [topbarRect, setTopbarRect] = useState<Rect>({
@@ -50,13 +50,14 @@ export default function Carousel({ images, index }: { images: Images; index: num
     const heightOffset = topbarRect.height + bottombarRect.height
 
     if (bodyRect.width && heightOffset) {
-      const renderSlides = []
+      const adjacentSlides = []
+      const slidesCount = Math.min(3, slides.length)
 
-      for (let i = currentIndex - 1; i <= currentIndex + 1; i++) {
-        const dir = i - currentIndex
-        const nextSlideIdx = getNextSlideIndex(currentIndex, dir, images.length) /*adjacent slide index*/
+      for (let i = -1; i < slidesCount - 1; i++) {
+        if (slides.length === 1) ++i
 
-        const img = images[nextSlideIdx]
+        const slideIdx = getSlideIndex(currentIndex, i, slides.length)
+        const img = slides[slideIdx]
 
         const [width, height] = measureContainedImgWidth(
           { width: bodyRect.width, height: bodyRect.height - heightOffset },
@@ -69,26 +70,24 @@ export default function Carousel({ images, index }: { images: Images; index: num
             height,
             scale: 1,
             aspectRatio: img.aspectRatio,
-            y: 0,
-            x: bodyRect.width * dir,
+            y: (bodyRect.height - height) / 2,
+            x: bodyRect.width * i,
             config,
           },
-          index: nextSlideIdx,
+          index: slideIdx,
           containedWidth: width,
           src: resizeImage(img.src, width),
         }
-
-        if (i === currentIndex) {
+        if (i + currentIndex === currentIndex) {
           values.springValues.x = (bodyRect.width - width) / 2
-          values.springValues.y = (bodyRect.height - height) / 2
         }
 
-        renderSlides.push(values)
+        adjacentSlides.push(values)
       }
 
-      setContainedImages(renderSlides)
+      setContainedImages(adjacentSlides)
     }
-  }, [bodyRect, topbarRect, bottombarRect, images, currentIndex])
+  }, [bodyRect, topbarRect, bottombarRect, slides, currentIndex])
 
   useEffect(() => {
     const handler = (e: Event) => e.preventDefault()
@@ -124,7 +123,7 @@ export default function Carousel({ images, index }: { images: Images; index: num
         bodyRect,
         topbarRect,
         bottombarRect,
-        totalImages: images.length,
+        totalImages: slides.length,
         springApi: api,
         setCurrentIndex,
         currentIndex: currentIndex,
