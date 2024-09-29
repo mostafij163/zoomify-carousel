@@ -28,6 +28,7 @@ export type DragGesture = {
 export type ImageSpringProps = {
   x: number
   y: number
+  scale: number
   width: number
   height: number
   aspectRatio: number
@@ -39,10 +40,12 @@ export type ImageSpring = SpringValues<ImageSpringProps & CSSProperties>
 export type Rect = Omit<DOMRect, 'toJSON'>
 
 export type ImageProps = Pick<HTMLElement & HTMLImageElement, 'src'> & {
-  id: number
+  index: number
   style: ImageSpring
   containedWidth: number
 } & Partial<Pick<HTMLImageElement, 'srcset' | 'sizes' | 'width' | 'height'>>
+
+export type ContainedImage = Omit<ImageProps, 'style'> & { springValues: ImageSpringProps }
 
 export type SidebarProps = {
   isOpen: boolean

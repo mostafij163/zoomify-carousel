@@ -1,21 +1,23 @@
 import { Handler } from '@use-gesture/react'
 import { resizeImage } from '../utils'
 import { RefObject, useCallback } from 'react'
+import { Rect } from '../types/types'
 
 export default function useImgPinchEnd({
   imgRef,
-  containerRef,
+  containerRect,
 }: {
   imgRef: RefObject<HTMLImageElement>
-  containerRef: RefObject<HTMLDivElement>
+  containerRect: Rect
 }) {
-  return useCallback<Handler<'pinch'>>(function onPinchEnd() {
-    if (imgRef.current) {
-      const { width } = containerRef.current!.getBoundingClientRect()
-
-      const newSrc = resizeImage(imgRef.current.src, width)
-
-      imgRef.current.src = newSrc
-    }
-  }, [])
+  return useCallback<Handler<'pinch'>>(
+    function onPinchEnd() {
+      if (imgRef.current) {
+        const { width } = containerRect
+        const newSrc = resizeImage(imgRef.current.src, width)
+        imgRef.current.src = newSrc
+      }
+    },
+    [containerRect]
+  )
 }

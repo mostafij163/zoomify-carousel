@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { setRect } from '../types/types'
 import useCarousel from '../context/Carousel'
 import ToolbarIcnBtn from './ToolbarIcnBtn'
+import { getNextSlideIndex } from '../utils'
 
 export default function Bottombar({ setRect }: { setRect: setRect }) {
   const [bottombarRef, bottombarRect] = useMeasure()
@@ -12,19 +13,27 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
 
   useLayoutEffect(() => setRect(bottombarRect), [bottombarRect])
 
-  function onClick(dir: 1 | -1) {
-    const prevId = currentIndex === 0 ? totalImages - 1 : currentIndex - 1
-    const nextId = currentIndex === totalImages - 1 ? 0 : currentIndex + 1
+  function onSwipe(dir: 1 | -1) {
+    const nextSlideIdx = getNextSlideIndex(currentIndex, dir, totalImages)
 
     springApi.start(i => {
-      const nextImage = dir === -1 ? nextId : prevId
+      const nextSpringIdx = getNextSlideIndex(currentIndex, i + dir, totalImages)
 
-      if (i === currentIndex) {
-        return { x: -5000 * dir, y: 0 }
-      } else if (i === nextImage) {
-        setCurrentIndex(nextImage)
-        return { x: 0, y: 0 }
-      } else return
+      setCurrentIndex(nextSlideIdx)
+
+      console.log(i, nextSpringIdx, nextSlideIdx)
+
+      if (nextSlideIdx === nextSpringIdx) {
+        // console.log(i)
+      }
+
+      return {}
+      // if (i === currentIndex) {
+      //   return { x: -5000 * dir, y: 0 }
+      // } else if (i === nextImage) {
+      //   setCurrentIndex(nextImage)
+      //   return { x: 0, y: 0 }
+      // } else return
     })
   }
 
@@ -32,17 +41,15 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
     <div
       ref={bottombarRef}
       className="p-4 flex gap-8 bg-inherit absolute bottom-0 left-0 z-40 w-full text-slate-100 justify-end items-center text-lg">
-      <div className="flex gap-2">
-        <span>{currentIndex + 1}</span>
-        <span>/</span>
-        <span className="text-slate-400">{totalImages}</span>
+      <div className="flex gap-1">
+        <span>{currentIndex + 1}</span>/<span className="text-slate-300">{totalImages}</span>
       </div>
       <div className="flex justify-center items-center gap-2">
         <ToolbarIcnBtn>
-          <ChevronLeft className="w-[1.5em] h-[1.5em]" onClick={() => onClick(1)} />
+          <ChevronLeft className="w-[1.5em] h-[1.5em]" onClick={() => onSwipe(-1)} />
         </ToolbarIcnBtn>
         <ToolbarIcnBtn>
-          <ChevronRight className="w-[1.5em] h-[1.5em]" onClick={() => onClick(-1)} />
+          <ChevronRight className="w-[1.5em] h-[1.5em]" onClick={() => onSwipe(1)} />
         </ToolbarIcnBtn>
       </div>
     </div>
