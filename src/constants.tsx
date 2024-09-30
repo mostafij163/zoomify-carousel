@@ -1,6 +1,1 @@
-export const springConfig1 = {
-  bounce: 0,
-  mass: 3,
-  tension: 350,
-  friction: 40,
-}
+export const springConfig1 = { mass: 3, tension: 250, friction: 40, bounce: 0 }
