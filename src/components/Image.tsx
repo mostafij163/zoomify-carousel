@@ -20,13 +20,15 @@ export default function Image({ index, src, containedWidth, style }: ImageProps)
   const onPinch = useImgPinch({ index, containerRect, containedWidth, style })
   const onPinchEnd = useImgPinchEnd({ imgRef, containerRect })
 
+  const maxScale = style.maxWidth.get() / containedWidth
+
   const config: UserGestureConfig = {
     target: containerRef,
     eventOptions: { passive: false },
     pinch: {
       modifierKey: null,
       rubberband: false,
-      scaleBounds: { min: 1, max: 10 },
+      scaleBounds: { min: 1, max: maxScale },
     },
     drag: {
       pointer: {

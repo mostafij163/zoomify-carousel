@@ -5,7 +5,8 @@ import { ClassValue } from 'clsx'
 
 export type Images = {
   src: string
-  aspectRatio: number
+  width: number
+  height: number
 }[]
 
 export type PinchMemo = {
@@ -31,6 +32,7 @@ export type ImageSpringProps = {
   scale: number
   width: number
   height: number
+  maxWidth: number
   aspectRatio: number
   config?: SpringConfig
 }
@@ -60,6 +62,8 @@ export type CarouselContextType = {
   currentIndex: number
   setCurrentIndex: (index: number) => void
   springApi: SpringRef<ImageSpringProps>
+  zoom: number
+  setZoom: (zoom: number) => void
 }
 
 export interface IconButton extends ButtonHTMLAttributes<HTMLButtonElement> {

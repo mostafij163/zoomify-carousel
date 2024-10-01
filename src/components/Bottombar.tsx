@@ -1,15 +1,17 @@
 import { useLayoutEffect } from 'react'
 import useMeasure from 'react-use-measure'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowBigDownDash, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
 
+import { Slider } from './Slider'
+import { calcResponsiveImgWidth, getSlideIndex, measureContainedSize } from '../utils'
 import { setRect } from '../types/types'
-import useCarousel from '../context/Carousel'
 import ToolbarIcnBtn from './ToolbarIcnBtn'
-import { getSlideIndex } from '../utils'
+import useCarousel from '../context/Carousel'
+import useCallbackRef from '../hooks/useCallbackRef'
 
 export default function Bottombar({ setRect }: { setRect: setRect }) {
   const [bottombarRef, bottombarRect] = useMeasure()
-  const { springApi, totalImages, currentIndex, setCurrentIndex } = useCarousel()
+  const { bodyRect, topbarRect, springApi, totalImages, currentIndex, setCurrentIndex, zoom, setZoom } = useCarousel()
 
   useLayoutEffect(() => setRect(bottombarRect), [bottombarRect])
 
@@ -20,37 +22,70 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
       const nextSpringIdx = getSlideIndex(currentIndex, i + dir, totalImages)
 
       setCurrentIndex(nextSlideIdx)
-
-      console.log(i, nextSpringIdx, nextSlideIdx)
-
       if (nextSlideIdx === nextSpringIdx) {
         // console.log(i)
       }
 
       return {}
-      // if (i === currentIndex) {
-      //   return { x: -5000 * dir, y: 0 }
-      // } else if (i === nextImage) {
-      //   setCurrentIndex(nextImage)
-      //   return { x: 0, y: 0 }
-      // } else return
     })
   }
+
+  const onZoomChange = useCallbackRef(([zoom]: number[]) => {
+    springApi.start((i, ctrl) => {
+      if (totalImages === 1) ++i
+      if (--i + currentIndex === currentIndex) {
+        const props = ctrl.get()
+
+        const newWidth = (props.maxWidth * zoom) / 100
+        const [width, height] = measureContainedSize(
+          { width: bodyRect.width, height: bodyRect.height - topbarRect.height - bottombarRect.height },
+          props.aspectRatio
+        )
+
+        const minZoom = Math.round((width / calcResponsiveImgWidth(props.maxWidth)) * 100)
+
+        if (zoom <= minZoom) {
+          setZoom(minZoom)
+
+          return { width, height }
+        } else {
+          setZoom(zoom)
+          return { width: newWidth, height: newWidth / props.aspectRatio }
+        }
+      }
+      return {}
+    })
+  })
 
   return (
     <div
       ref={bottombarRef}
-      className="p-4 flex gap-8 bg-inherit absolute bottom-0 left-0 z-40 w-full text-slate-100 justify-end items-center text-lg">
-      <div className="flex gap-1">
-        <span>{currentIndex + 1}</span>/<span className="text-slate-300">{totalImages}</span>
+      className="p-4 bg-inherit absolute bottom-0 left-0 z-40 w-full text-slate-100 flex justify-between items-center">
+      <div className="text-lg flex justify-start items-center gap-4 basis-3/4 flex-row flex-wrap">
+        <ToolbarIcnBtn>
+          <div className="flex justify-start items-center gap-1">
+            <ArrowBigDownDash size="1.5em" />
+            <span className="hidden md:inline-block">Download</span>
+          </div>
+        </ToolbarIcnBtn>
+        <div className="flex justify-start items-center gap-1  basis-full min-w-36 max-w-48 text-lg">
+          <ZoomIn size="2em" />
+          <Slider min={1} max={100} value={[zoom]} step={1} onValueChange={onZoomChange} />
+          <span>{zoom}%</span>
+        </div>
       </div>
-      <div className="flex justify-center items-center gap-2">
-        <ToolbarIcnBtn>
-          <ChevronLeft className="w-[1.5em] h-[1.5em]" onClick={() => onSwipe(-1)} />
-        </ToolbarIcnBtn>
-        <ToolbarIcnBtn>
-          <ChevronRight className="w-[1.5em] h-[1.5em]" onClick={() => onSwipe(1)} />
-        </ToolbarIcnBtn>
+      <div className="flex justify-end gap-6 text-lg">
+        <div className="flex gap-1">
+          <span>{currentIndex + 1}</span>/<span className="text-slate-300">{totalImages}</span>
+        </div>
+        <div className="hidden md:flex justify-center items-center gap-1  ">
+          <ToolbarIcnBtn>
+            <ChevronLeft size="1.5em" onClick={() => onSwipe(-1)} />
+          </ToolbarIcnBtn>
+          <ToolbarIcnBtn>
+            <ChevronRight size="1.5em" onClick={() => onSwipe(1)} />
+          </ToolbarIcnBtn>
+        </div>
       </div>
     </div>
   )

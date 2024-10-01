@@ -16,7 +16,7 @@ export default function useImgPinch({
   containedWidth: number
   containerRect: Rect
 }) {
-  const { springApi, bodyRect } = useCarousel()
+  const { springApi, bodyRect, zoom, setZoom } = useCarousel()
 
   return useCallback<Handler<'pinch'>>(
     function onPinch({ down, cancel, origin: [ox, oy], first, movement: [ms], offset: [s], memo }) {
@@ -53,6 +53,8 @@ export default function useImgPinch({
 
         let x = pinchMemo.x - deltaX,
           y = pinchMemo.y - deltaY
+
+        setZoom(Math.round((newWidth / style.maxWidth.get()) * 100))
 
         springApi.start(i => {
           if (i !== index) return

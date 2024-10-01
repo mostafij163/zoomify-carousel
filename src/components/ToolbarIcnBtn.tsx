@@ -1,5 +1,3 @@
-import { ClassValue } from 'clsx'
-import { ReactNode } from 'react'
 import { mergeClasses } from '../utils'
 import { IconButton } from '../types/types'
 
