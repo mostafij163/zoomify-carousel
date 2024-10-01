@@ -36,7 +36,6 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
       if (--i + currentIndex === currentIndex) {
         const props = ctrl.get()
 
-        const newWidth = (props.maxWidth * zoom) / 100
         const [width, height] = measureContainedSize(
           { width: bodyRect.width, height: bodyRect.height - topbarRect.height - bottombarRect.height },
           props.aspectRatio
@@ -47,10 +46,21 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
         if (zoom <= minZoom) {
           setZoom(minZoom)
 
-          return { width, height }
+          return {
+            width,
+            height,
+            x: (bodyRect.width - width) / 2,
+            y: (bodyRect.height - height) / 2,
+          }
         } else {
+          const newWidth = (props.maxWidth * zoom) / 100
+          const newHeight = newWidth / props.aspectRatio
+          /*highlight: current translation also need to take into account*/
+          const x = (bodyRect.width - newWidth) / 2
+          const y = (bodyRect.height - newHeight) / 2
+
           setZoom(zoom)
-          return { width: newWidth, height: newWidth / props.aspectRatio }
+          return { width: newWidth, height: newHeight, x, y }
         }
       }
       return {}

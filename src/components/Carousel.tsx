@@ -9,7 +9,7 @@ import Bottombar from './Bottombar'
 import useCallbackRef from '../hooks/useCallbackRef'
 import { CarouselContext } from '../context/Carousel'
 import { ContainedImage, Images, Rect } from '../types/types'
-import { getSlideIndex, measureContainedSize, resizeImage } from '../utils'
+import { calcActualImgWidth, getSlideIndex, measureContainedSize, resizeImage } from '../utils'
 
 const config: SpringConfig = {
   precision: 0.001,
@@ -74,7 +74,7 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
             height,
             scale: 1,
             aspectRatio,
-            maxWidth: img.width / devicePixelRatio || 1,
+            maxWidth: calcActualImgWidth(img.width),
             y: (bodyRect.height - height) / 2,
             x: bodyRect.width * i,
             config,
@@ -83,6 +83,7 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
           containedWidth: width,
           src: resizeImage(img.src, width),
         }
+
         if (i + currentIndex === currentIndex) {
           values.springValues.x = (bodyRect.width - width) / 2
           setZoomLevel(Math.round((width / img.width) * 100))

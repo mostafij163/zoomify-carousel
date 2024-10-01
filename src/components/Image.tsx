@@ -55,7 +55,7 @@ export default function Image({ index, src, containedWidth, style }: ImageProps)
     <animated.div
       style={style}
       ref={mergeRefs([containerRef, measureRef])}
-      className="absolute cursor-grab select-none will-change-transform touch-none conten">
+      className="absolute cursor-grab select-none will-change-transform touch-none">
       <animated.img
         src={src}
         ref={imgRef}

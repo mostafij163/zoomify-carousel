@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Testing</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+      }
+
+      .container {
+        position: absolute;
+        /* width: 585.75px;
+        height: 781px; */
+        width: 985.75px;
+        height: 1314.3333px;
+        z-index: 5;
+      }
+      .container img {
+        width: 100%;
+        height: auto;
+      }
+
+      #bound {
+        position: relative;
+        width: 785.75px;
+        height: 1047.6666px;
+        border: 2px solid red;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+ 
+    <div id="bound">
+        <div id="container" class="container">
+            <img src="https://images.unsplash.com/photo-1716097782146-9b17e82103c3?q=100&w=1050&auto=format" alt="" />
+        </div>
+    </div>
+    </div>
+
+    <script>
+      const bodyRect = document.getElementById("bound").getBoundingClientRect()
+      const cont = document.getElementById('container')
+      const contRect = cont.getBoundingClientRect()
+      const translate = `translate(${(bodyRect.width - contRect.width-contRect.left) / 2}px, ${(bodyRect.height - contRect.height-contRect.top) / 2}px)`
+
+      console.log(translate);
+      
+      cont.style.transform = translate
+
+         /*
+            initial translate: x: 161.625px, y: 65px
+
+            y: 133.3333
+            x: 100
+         */
+    </script>
+  </body>
+</html>
