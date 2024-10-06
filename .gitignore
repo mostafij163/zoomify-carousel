@@ -2,3 +2,5 @@
 # Local Netlify folder
 .netlify
 /build
+
+test.html

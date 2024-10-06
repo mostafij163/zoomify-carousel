@@ -32,9 +32,9 @@ export default function Image({ index, src, containedWidth, style }: ImageProps)
     },
     drag: {
       pointer: {
+        touch: true,
+        keys: false,
         capture: false,
-        keys: true,
-        lock: true,
       },
       rubberband: false,
       preventDefault: true,
