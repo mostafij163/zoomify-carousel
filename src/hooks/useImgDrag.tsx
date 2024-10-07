@@ -2,8 +2,8 @@ import { useCallback } from 'react'
 import { Handler } from '@use-gesture/react'
 
 import { Rect } from '../types/types'
-import useCarousel from '../context/Carousel'
 import { getSlideIndex } from '../utils'
+import useCarousel from '../context/Carousel'
 import { springConfig1 } from '../constants'
 
 export default function useImgDrag({
@@ -18,12 +18,23 @@ export default function useImgDrag({
   const { springApi, totalImages, currentIndex, setCurrentIndex } = useCarousel()
 
   return useCallback<Handler<'drag'>>(
-    function onDrag({ pinching, down, distance: [dx], cancel, offset: [x, y], velocity: [xVel], direction: [xDir] }) {
-      if (pinching) return cancel()
-
+    function onDrag({
+      pinching,
+      down,
+      cancel,
+      type,
+      movement: [mx],
+      distance: [xDis],
+      offset: [x, y],
+      velocity: [xVel],
+      direction: [xDir],
+    }) {
+      //type: pointerdown, pointermove, touchstart, touchmove
       const { width } = containerRect
 
-      const trigger = xVel > 1 && dx > width - 100 && !down
+      if (pinching || (width <= containedWidth && type === 'pointerdown')) return cancel()
+
+      const trigger = xVel > 1 && xDis > width - 100 && !down
       const dir = xDir < 0 ? 1 : -1
 
       const nextSlideIdx = getSlideIndex(currentIndex, dir, totalImages)
