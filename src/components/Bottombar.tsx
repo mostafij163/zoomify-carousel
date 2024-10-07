@@ -90,10 +90,10 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
         </div>
         <div className="hidden md:flex justify-center items-center gap-1  ">
           <ToolbarIcnBtn>
-            <ChevronLeft size="1.5em" onClick={() => onSwipe(-1)} />
+            <ChevronLeft size="1.5em" onClick={() => onSwipe(1)} />
           </ToolbarIcnBtn>
           <ToolbarIcnBtn>
-            <ChevronRight size="1.5em" onClick={() => onSwipe(1)} />
+            <ChevronRight size="1.5em" onClick={() => onSwipe(-1)} />
           </ToolbarIcnBtn>
         </div>
       </div>

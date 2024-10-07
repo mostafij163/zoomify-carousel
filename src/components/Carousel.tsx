@@ -40,14 +40,26 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
     y: 0,
   })
 
-  const [containedImages, setContainedImages] = useState<ContainedImage[]>([])
   const [zoom, setZoom] = useState<number>(0)
-
+  const [containedImages, setContainedImages] = useState<ContainedImage[]>([])
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   const [springs, api] = useSprings(containedImages.length, i => containedImages[i].springValues, [containedImages])
 
   const setZoomLevel = useCallbackRef((zoom: number) => setZoom(zoom))
+  const setCurrentIndex = useCallbackRef((index: number) => setIndex(index))
+  const keyboardNavHandler = useCallbackRef((event: KeyboardEvent) => {
+    switch (event.code) {
+      case 'ArrowRight':
+        setCurrentIndex(getSlideIndex(currentIndex, 1, slides.length))
+      case 'ArrowUp':
+        setCurrentIndex(getSlideIndex(currentIndex, 1, slides.length))
+      case 'ArrowLeft':
+        setCurrentIndex(getSlideIndex(currentIndex, -1, slides.length))
+      case 'ArrowDown':
+        setCurrentIndex(getSlideIndex(currentIndex, -1, slides.length))
+    }
+  })
 
   useLayoutEffect(() => {
     const heightOffset = topbarRect.height + bottombarRect.height
@@ -101,19 +113,17 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
     document.addEventListener('gesturestart', handler)
     document.addEventListener('gesturechange', handler)
     document.addEventListener('gestureend', handler)
+    document.addEventListener('keydown', keyboardNavHandler)
     return () => {
       document.removeEventListener('gesturestart', handler)
       document.removeEventListener('gesturechange', handler)
       document.removeEventListener('gestureend', handler)
+      document.removeEventListener('keydown', keyboardNavHandler)
     }
-  }, [])
+  }, [keyboardNavHandler])
 
   const closeSidebar = useCallbackRef(function closeSidebar() {
     setIsSidebarOpen(false)
-  })
-
-  const setCurrentIndex = useCallbackRef(function setCurrentIndex(index: number) {
-    setIndex(index)
   })
 
   const topbarCallback = useCallbackRef((rect: Rect) => {
