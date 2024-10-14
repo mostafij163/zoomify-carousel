@@ -52,14 +52,22 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
     switch (event.code) {
       case 'ArrowRight':
         setCurrentIndex(getSlideIndex(currentIndex, 1, slides.length))
+        break
       case 'ArrowUp':
         setCurrentIndex(getSlideIndex(currentIndex, 1, slides.length))
+        break
       case 'ArrowLeft':
         setCurrentIndex(getSlideIndex(currentIndex, -1, slides.length))
+        break
       case 'ArrowDown':
         setCurrentIndex(getSlideIndex(currentIndex, -1, slides.length))
+        break
+      default:
+        break
     }
   })
+
+  console.log(currentIndex)
 
   useLayoutEffect(() => {
     const heightOffset = topbarRect.height + bottombarRect.height
