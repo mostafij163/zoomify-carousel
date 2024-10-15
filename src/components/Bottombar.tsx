@@ -30,7 +30,7 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
           props.aspectRatio
         )
 
-        const minZoom = Math.round((width / calcResponsiveImgWidth(props.maxWidth)) * 100)
+        const minZoom = Math.round((width / props.maxWidth) * 100)
 
         if (zoom <= minZoom) {
           setZoom(minZoom)
