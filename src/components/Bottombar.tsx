@@ -77,7 +77,7 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
         <div className="flex gap-1">
           <span>{currentIndex + 1}</span>/<span className="text-slate-300">{totalImages}</span>
         </div>
-        <div className="hidden md:flex justify-center items-center gap-1  ">
+        <div className="flex justify-center items-center gap-1  ">
           <ToolbarIcnBtn>
             <ChevronLeft size="1.5em" onClick={() => onSwipe(-1)} />
           </ToolbarIcnBtn>
