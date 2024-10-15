@@ -30,7 +30,7 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
           props.aspectRatio
         )
 
-        const minZoom = Math.round((width / props.maxWidth) * 100)
+        const minZoom = (width / props.maxWidth) * 100
 
         if (zoom <= minZoom) {
           setZoom(minZoom)
@@ -70,7 +70,7 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
         <div className="flex justify-start items-center gap-1  basis-full min-w-36 max-w-48 text-lg">
           <ZoomIn size="2em" />
           <Slider min={1} max={100} value={[zoom]} step={1} onValueChange={onZoomChange} />
-          <span>{zoom}%</span>
+          <span>{Math.round(zoom)}%</span>
         </div>
       </div>
       <div className="flex justify-end gap-6 text-lg">
