@@ -67,8 +67,6 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
     }
   })
 
-  console.log(currentIndex)
-
   useLayoutEffect(() => {
     const heightOffset = topbarRect.height + bottombarRect.height
 
@@ -106,7 +104,7 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
 
         if (i + currentIndex === currentIndex) {
           values.springValues.x = (bodyRect.width - width) / 2
-          setZoomLevel(Math.round((width / img.width) * 100))
+          setZoomLevel(Math.round((width / calcActualImgWidth(img.width)) * 100))
         }
 
         adjacentSlides.push(values)

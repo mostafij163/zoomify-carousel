@@ -3,11 +3,10 @@ import useMeasure from 'react-use-measure'
 import { ArrowBigDownDash, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
 
 import { Slider } from './Slider'
-import { calcResponsiveImgWidth, getSlideIndex, measureContainedSize } from '../utils'
 import { setRect } from '../types/types'
 import ToolbarIcnBtn from './ToolbarIcnBtn'
 import useCarousel from '../context/Carousel'
-import useCallbackRef from '../hooks/useCallbackRef'
+import { calcResponsiveImgWidth, getSlideIndex, measureContainedSize } from '../utils'
 
 export default function Bottombar({ setRect }: { setRect: setRect }) {
   const [bottombarRef, bottombarRect] = useMeasure()
@@ -17,20 +16,10 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
 
   function onSwipe(dir: 1 | -1) {
     const nextSlideIdx = getSlideIndex(currentIndex, dir, totalImages)
-
-    springApi.start(i => {
-      const nextSpringIdx = getSlideIndex(currentIndex, i + dir, totalImages)
-
-      setCurrentIndex(nextSlideIdx)
-      if (nextSlideIdx === nextSpringIdx) {
-        // console.log(i)
-      }
-
-      return {}
-    })
+    setCurrentIndex(nextSlideIdx)
   }
 
-  const onZoomChange = useCallbackRef(([zoom]: number[]) => {
+  function onZoomChange([zoom]: number[]) {
     springApi.start((i, ctrl) => {
       if (totalImages === 1) ++i
       if (--i + currentIndex === currentIndex) {
@@ -65,7 +54,7 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
       }
       return {}
     })
-  })
+  }
 
   return (
     <div
@@ -90,10 +79,10 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
         </div>
         <div className="hidden md:flex justify-center items-center gap-1  ">
           <ToolbarIcnBtn>
-            <ChevronLeft size="1.5em" onClick={() => onSwipe(1)} />
+            <ChevronLeft size="1.5em" onClick={() => onSwipe(-1)} />
           </ToolbarIcnBtn>
           <ToolbarIcnBtn>
-            <ChevronRight size="1.5em" onClick={() => onSwipe(-1)} />
+            <ChevronRight size="1.5em" onClick={() => onSwipe(1)} />
           </ToolbarIcnBtn>
         </div>
       </div>
