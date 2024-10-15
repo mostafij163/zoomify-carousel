@@ -16,10 +16,10 @@ export default function useImgPinch({
   containerRect: Rect
   containedWidth: number
 }) {
-  const { springApi, setZoom, bodyRect, topbarRect, bottombarRect } = useCarousel()
+  const { springApi, setZoom, bodyRect } = useCarousel()
 
   return useCallback<Handler<'pinch'>>(
-    function onPinch({ down, active, cancel, origin: [ox, oy], first, movement: [ms], offset: [s], memo }) {
+    function onPinch({ down, cancel, origin: [ox, oy], first, movement: [ms], offset: [s], memo }) {
       const { width, top, left } = containerRect
 
       if (first && !down) {
@@ -46,12 +46,9 @@ export default function useImgPinch({
         let x = memo.x - dx,
           y = memo.y - dy
 
-        if (!active && newWidth <= containedWidth) {
+        if (Math.floor(newWidth) <= Math.floor(containedWidth) && !down) {
           x = (bodyRect.width - containedWidth) / 2
-          y = (bodyRect.height - newHeight) / 2
-
-          console.log('x, y: ', x, y)
-          // translate3d(130.437px, 43.75px, 0px) scale(1)
+          y = (bodyRect.height - containedWidth / style.aspectRatio.get()) / 2
 
           cancel()
         }
