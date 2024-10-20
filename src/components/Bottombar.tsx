@@ -6,54 +6,36 @@ import { Slider } from './Slider'
 import { setRect } from '../types/types'
 import ToolbarIcnBtn from './ToolbarIcnBtn'
 import useCarousel from '../context/Carousel'
-import { calcResponsiveImgWidth, getSlideIndex, measureContainedSize } from '../utils'
+import { calcActualWidth, getSlideIndex } from '../utils'
 
 export default function Bottombar({ setRect }: { setRect: setRect }) {
   const [bottombarRef, bottombarRect] = useMeasure()
-  const { bodyRect, topbarRect, springApi, totalImages, currentIndex, setCurrentIndex, zoom, setZoom } = useCarousel()
+  const { springApi, bodyRect, topbarRect, totalImages, image, currentIndex, setCurrentIndex, zoom, setZoom } =
+    useCarousel()
 
   useLayoutEffect(() => setRect(bottombarRect), [bottombarRect])
 
   function onSwipe(dir: 1 | -1) {
-    const nextSlideIdx = getSlideIndex(currentIndex, dir, totalImages)
-    setCurrentIndex(nextSlideIdx)
+    setCurrentIndex(getSlideIndex(currentIndex, dir, totalImages))
   }
 
-  function onZoomChange([zoom]: number[]) {
-    springApi.start((i, ctrl) => {
-      if (totalImages === 1) ++i
-      if (--i + currentIndex === currentIndex) {
-        const props = ctrl.get()
+  function onZoomChange([zoomPercent]: number[]) {
+    const maxWidth = calcActualWidth(image.maxWidth)
+    const minZoomPercent = (image.containedWidth / maxWidth) * 100
+    const scale = zoomPercent / minZoomPercent
 
-        const [width, height] = measureContainedSize(
-          { width: bodyRect.width, height: bodyRect.height - topbarRect.height - bottombarRect.height },
-          props.aspectRatio
-        )
+    if (zoomPercent <= minZoomPercent - 1) return
+    else {
+      const width = image.containedWidth * scale
 
-        const minZoom = (width / props.maxWidth) * 100
+      const x = (bodyRect.width - width) / 2,
+        y =
+          (bodyRect.height - bottombarRect.height - topbarRect.height - width / image.aspectRatio) / 2 +
+          topbarRect.height
 
-        if (zoom <= minZoom) {
-          setZoom(minZoom)
-
-          return {
-            width,
-            height,
-            x: (bodyRect.width - width) / 2,
-            y: (bodyRect.height - height) / 2,
-          }
-        } else {
-          const newWidth = (props.maxWidth * zoom) / 100
-          const newHeight = newWidth / props.aspectRatio
-          /*highlight: current translation also need to take into account*/
-          const x = (bodyRect.width - newWidth) / 2
-          const y = (bodyRect.height - newHeight) / 2
-
-          setZoom(zoom)
-          return { width: newWidth, height: newHeight, x, y }
-        }
-      }
-      return {}
-    })
+      setZoom(zoomPercent)
+      springApi.start(() => ({ x, y, scale }))
+    }
   }
 
   return (
@@ -70,7 +52,7 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
         <div className="flex justify-start items-center gap-1  basis-full min-w-36 max-w-48 text-lg">
           <ZoomIn size="2em" />
           <Slider min={1} max={100} value={[zoom]} step={1} onValueChange={onZoomChange} />
-          <span>{Math.round(zoom)}%</span>
+          <span>{Math.min(100, Math.round(zoom))}%</span>
         </div>
       </div>
       <div className="flex justify-end gap-6 text-lg">

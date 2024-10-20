@@ -26,4 +26,9 @@ export const images: Images = [
     width: 5000,
     height: 3333.3333,
   },
+  {
+    src: 'https://plus.unsplash.com/premium_photo-1676139292936-a2958a0d7177?q=80&w=1918&auto=format',
+    width: 5000,
+    height: 2195.4887,
+  },
 ]

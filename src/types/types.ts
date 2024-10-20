@@ -30,10 +30,6 @@ export type ImageSpringProps = {
   x: number
   y: number
   scale: number
-  width: number
-  height: number
-  maxWidth: number
-  aspectRatio: number
   config?: SpringConfig
 }
 
@@ -41,13 +37,13 @@ export type ImageSpring = SpringValues<ImageSpringProps & CSSProperties>
 
 export type Rect = Omit<DOMRect, 'toJSON'>
 
-export type ImageProps = Pick<HTMLElement & HTMLImageElement, 'src'> & {
-  index: number
-  style: ImageSpring
+export type ImageProps = Pick<HTMLImageElement, 'src'> & {
+  maxWidth: number
   containedWidth: number
-} & Partial<Pick<HTMLImageElement, 'srcset' | 'sizes' | 'width' | 'height'>>
+  aspectRatio: number
+}
 
-export type ContainedImage = Omit<ImageProps, 'style'> & { springValues: ImageSpringProps }
+export type ContainedImage = ImageProps & { springValues: ImageSpringProps }
 
 export type SidebarProps = {
   isOpen: boolean
@@ -55,13 +51,14 @@ export type SidebarProps = {
 }
 
 export type CarouselContextType = {
+  springApi: SpringRef<ImageSpringProps>
   bodyRect: Rect
   topbarRect: Rect
   bottombarRect: Rect
   totalImages: number
+  image: ImageProps
   currentIndex: number
   setCurrentIndex: (index: number) => void
-  springApi: SpringRef<ImageSpringProps>
   zoom: number
   setZoom: (zoom: number) => void
 }

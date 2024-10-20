@@ -1,5 +1,5 @@
 import useMeasure from 'react-use-measure'
-import { SpringConfig, useSprings } from '@react-spring/web'
+import { useIsomorphicLayoutEffect, useSpring } from '@react-spring/web'
 import { useEffect, useLayoutEffect, useState } from 'react'
 
 import Image from './Image'
@@ -9,16 +9,17 @@ import Bottombar from './Bottombar'
 import useCallbackRef from '../hooks/useCallbackRef'
 import { CarouselContext } from '../context/Carousel'
 import { ContainedImage, Images, Rect } from '../types/types'
-import { calcActualImgWidth, getSlideIndex, measureContainedSize, resizeImage } from '../utils'
+import {
+  calcActualWidth,
+  calcResponsiveWidth,
+  calcZoomPercent,
+  getSlideIndex,
+  measureContainedSize,
+  resizeImage,
+} from '../utils'
 
-const config: SpringConfig = {
-  precision: 0.001,
-  duration: 0,
-}
-
-export default function Carousel({ slides, index }: { slides: Images; index: number }) {
+export default function Carousel({ images, index }: { images: Images; index: number }) {
   const [bodyRef, bodyRect] = useMeasure()
-  const [currentIndex, setIndex] = useState<number>(index)
   const [topbarRect, setTopbarRect] = useState<Rect>({
     left: 0,
     top: 0,
@@ -41,78 +42,75 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
   })
 
   const [zoom, setZoom] = useState<number>(0)
-  const [containedImages, setContainedImages] = useState<ContainedImage[]>([])
+  const [currentIndex, setIndex] = useState<number>(index)
+  const [image, setImage] = useState<ContainedImage>({
+    src: '',
+    aspectRatio: 1,
+    containedWidth: 0,
+    maxWidth: 0,
+    springValues: {
+      x: 0,
+      y: 0,
+      scale: 0,
+    },
+  })
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const [springs, api] = useSprings(containedImages.length, i => containedImages[i].springValues, [containedImages])
+  const [spring, api] = useSpring(() => {
+    return image ? image.springValues : { x: 0, y: 0, scale: 1 }
+  }, [image])
 
   const setZoomLevel = useCallbackRef((zoom: number) => setZoom(zoom))
   const setCurrentIndex = useCallbackRef((index: number) => setIndex(index))
+
   const keyboardNavHandler = useCallbackRef((event: KeyboardEvent) => {
     switch (event.code) {
       case 'ArrowRight':
-        setCurrentIndex(getSlideIndex(currentIndex, 1, slides.length))
+        setCurrentIndex(getSlideIndex(currentIndex, 1, images.length))
         break
       case 'ArrowUp':
-        setCurrentIndex(getSlideIndex(currentIndex, 1, slides.length))
+        setCurrentIndex(getSlideIndex(currentIndex, 1, images.length))
         break
       case 'ArrowLeft':
-        setCurrentIndex(getSlideIndex(currentIndex, -1, slides.length))
+        setCurrentIndex(getSlideIndex(currentIndex, -1, images.length))
         break
       case 'ArrowDown':
-        setCurrentIndex(getSlideIndex(currentIndex, -1, slides.length))
+        setCurrentIndex(getSlideIndex(currentIndex, -1, images.length))
         break
       default:
         break
     }
   })
 
-  useLayoutEffect(() => {
-    const heightOffset = topbarRect.height + bottombarRect.height
+  useIsomorphicLayoutEffect(() => {
+    const imgViewport = { width: bodyRect.width, height: bodyRect.height - topbarRect.height - bottombarRect.height }
 
-    if (bodyRect.width && heightOffset) {
-      const adjacentSlides = []
-      const slidesCount = Math.min(3, slides.length)
+    if (imgViewport.height > 0) {
+      const img = images[currentIndex]
+      const aspectRatio = img.width / img.height
 
-      for (let i = -1; i < slidesCount - 1; i++) {
-        if (slides.length === 1) ++i
+      const [width, height] = measureContainedSize(imgViewport, aspectRatio)
 
-        const slideIdx = getSlideIndex(currentIndex, i, slides.length)
-        const img = slides[slideIdx]
-        const aspectRatio = img.width / img.height
-
-        const [width, height] = measureContainedSize(
-          { width: bodyRect.width, height: bodyRect.height - heightOffset },
-          aspectRatio
-        )
-
-        const values: ContainedImage = {
-          springValues: {
-            width,
-            height,
-            scale: 1,
-            aspectRatio,
-            maxWidth: calcActualImgWidth(img.width),
-            y: (bodyRect.height - height) / 2,
-            x: bodyRect.width * i,
-            config,
+      const config: ContainedImage = {
+        springValues: {
+          scale: 1,
+          y: (imgViewport.height - height) / 2 + topbarRect.height,
+          x: (imgViewport.width - width) / 2,
+          config: {
+            precision: 0.001,
+            duration: 0,
           },
-          index: slideIdx,
-          containedWidth: width,
-          src: resizeImage(img.src, width),
-        }
-
-        if (i + currentIndex === currentIndex) {
-          values.springValues.x = (bodyRect.width - width) / 2
-          setZoomLevel((width / calcActualImgWidth(img.width)) * 100)
-        }
-
-        adjacentSlides.push(values)
+        },
+        aspectRatio,
+        maxWidth: img.width,
+        containedWidth: width,
+        src: resizeImage(img.src, width),
       }
 
-      setContainedImages(adjacentSlides)
+      setZoomLevel(calcZoomPercent(width, img.width))
+      setImage(config)
     }
-  }, [bodyRect, topbarRect, bottombarRect, slides, currentIndex, setZoomLevel])
+  }, [bodyRect, topbarRect, bottombarRect, images, currentIndex, setZoomLevel])
 
   useEffect(() => {
     const handler = (e: Event) => e.preventDefault()
@@ -146,12 +144,18 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
         bodyRect,
         topbarRect,
         bottombarRect,
-        totalImages: slides.length,
+        totalImages: images.length,
         springApi: api,
-        setCurrentIndex,
-        currentIndex: currentIndex,
         zoom,
         setZoom: setZoomLevel,
+        currentIndex,
+        setCurrentIndex,
+        image: {
+          src: image.src,
+          aspectRatio: image.aspectRatio,
+          maxWidth: image.maxWidth,
+          containedWidth: image.containedWidth,
+        },
       }}>
       <div className="h-screen w-screen overflow-hidden">
         <div className="flex h-full">
@@ -159,15 +163,7 @@ export default function Carousel({ slides, index }: { slides: Images; index: num
           <div className="flex-1 bg-slate-900 relative h-full w-full">
             <Topbar setIsOpen={setIsSidebarOpen} setRect={topbarCallback} />
             <div ref={bodyRef} className="w-full h-full relative">
-              {springs.map((spring, i) => (
-                <Image
-                  key={i}
-                  index={i}
-                  style={spring}
-                  src={containedImages[i].src}
-                  containedWidth={containedImages[i].containedWidth}
-                />
-              ))}
+              <Image style={spring} />
             </div>
             <Bottombar setRect={bottombarCallback} />
           </div>

@@ -1,7 +1,8 @@
 import { Handler } from '@use-gesture/react'
-import { resizeImage } from '../utils'
 import { RefObject, useCallback } from 'react'
+
 import { Rect } from '../types/types'
+import { resizeImage } from '../utils'
 
 export default function useImgPinchEnd({
   imgRef,

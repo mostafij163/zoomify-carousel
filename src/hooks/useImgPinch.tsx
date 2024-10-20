@@ -1,57 +1,37 @@
 import { Handler } from '@use-gesture/react'
 
-import useCallbackRef from './useCallbackRef'
+import { calcZoomPercent } from '../utils'
 import { springConfig1 } from '../constants'
+import useCallbackRef from './useCallbackRef'
 import useCarousel from '../context/Carousel'
-import { ImageSpring, PinchMemo, Rect } from '../types/types'
+import { PinchMemo, Rect } from '../types/types'
 
-export default function useImgPinch({
-  index,
-  style,
-  containerRect,
-  containedWidth,
-}: {
-  index: number
-  style: ImageSpring
-  containerRect: Rect
-  containedWidth: number
-}) {
-  const { springApi, zoom, setZoom, bodyRect } = useCarousel()
+export default function useImgPinch({ containerRect }: { containerRect: Rect }) {
+  const { springApi, bodyRect, topbarRect, bottombarRect, image, setZoom } = useCarousel()
 
   return useCallbackRef<Handler<'pinch'>>(function onPinch({
-    down,
     memo,
     first,
     offset: [s],
     movement: [ms],
     origin: [ox, oy],
   }) {
-    const { width, top, left } = containerRect
+    const { top, left } = containerRect
 
     if (first) {
       memo = {
-        width,
         x: left,
         y: top,
         tx: ox - left,
         ty: oy - top,
       } as PinchMemo
-
-      const i = containedWidth / style.maxWidth.get()
-      const d = zoom / 100 / i
-
-      const dx = d - s
-      s += dx
     }
 
     if (memo) {
       /*new width is calculated by multiplying with the cumulative scale*/
+      let newWidth = image.containedWidth * s
 
-      let newWidth = containedWidth * s,
-        newHeight = newWidth / style.aspectRatio.get()
-
-      setZoom((newWidth / style.maxWidth.get()) * 100)
-
+      setZoom(calcZoomPercent(newWidth, image.maxWidth))
       /*delta x and delta y are calculated by multiplying with the change in scale from the initial scale. the initial scale is 1*/
       const dx = memo.tx * (ms - 1),
         dy = memo.ty * (ms - 1)
@@ -60,25 +40,18 @@ export default function useImgPinch({
         y = memo.y - dy
 
       if (s <= 1) {
-        newWidth = containedWidth
-        newHeight = containedWidth / style.aspectRatio.get()
-
-        x = (bodyRect.width - newWidth) / 2
-        y = (bodyRect.height - newHeight) / 2
+        x = (bodyRect.width - image.containedWidth) / 2
+        y =
+          (bodyRect.height - topbarRect.height - bottombarRect.height - image.containedWidth / image.aspectRatio) / 2 +
+          topbarRect.height
       }
 
-      springApi.start(i => {
-        if (i !== index) return
-
-        return {
-          x,
-          y,
-          width: newWidth,
-          height: newHeight,
-          immediate: down,
-          config: springConfig1,
-        }
-      })
+      springApi.start(() => ({
+        x,
+        y,
+        scale: s,
+        config: springConfig1,
+      }))
     }
 
     return memo
