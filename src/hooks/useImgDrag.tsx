@@ -14,7 +14,7 @@ export default function useImgDrag({ containerRect }: { containerRect: Rect }) {
       //type: pointerdown, pointermove, touchstart, touchmove
       const { width } = containerRect
 
-      const trigger = xVel > 0.5 && !type.startsWith('pointer')
+      const trigger = xVel > 0.5 && !down
       const dir = xDir < 0 ? 1 : -1
 
       if (pinching) return cancel()
