@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react'
 import useMeasure from 'react-use-measure'
-import { ArrowBigDownDash, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CloudDownload, ZoomIn } from 'lucide-react'
 
 import { Slider } from './Slider'
 import { setRect } from '../types/types'
@@ -41,16 +41,16 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
   return (
     <div
       ref={bottombarRef}
-      className="p-4 bg-inherit absolute bottom-0 left-0 z-40 w-full text-slate-100 flex justify-between items-center">
+      className="p-4 bg-inherit absolute bottom-0 left-0 z-40 w-full text-slate-100 flex justify-between items-center flex-wrap gap-2">
       <div className="text-lg flex justify-start items-center gap-4 basis-3/4 flex-row flex-wrap">
         <ToolbarIcnBtn>
           <div className="flex justify-start items-center gap-1">
-            <ArrowBigDownDash size="1.5em" />
+            <CloudDownload size="1.5em" />
             <span className="hidden md:inline-block">Download</span>
           </div>
         </ToolbarIcnBtn>
         <div className="flex justify-start items-center gap-1  basis-full min-w-36 max-w-48 text-lg">
-          <ZoomIn size="2em" />
+          <ZoomIn size="2.3em" />
           <Slider min={1} max={100} value={[zoom]} step={1} onValueChange={onZoomChange} />
           <span>{Math.min(100, Math.round(zoom))}%</span>
         </div>
@@ -59,12 +59,12 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
         <div className="flex gap-1">
           <span>{currentIndex + 1}</span>/<span className="text-slate-300">{totalImages}</span>
         </div>
-        <div className="flex justify-center items-center gap-1  ">
+        <div className="hidden md:flex justify-center items-center gap-2">
           <ToolbarIcnBtn>
-            <ChevronLeft size="1.5em" onClick={() => onSwipe(-1)} />
+            <ChevronLeft size="1.8em" onClick={() => onSwipe(-1)} />
           </ToolbarIcnBtn>
           <ToolbarIcnBtn>
-            <ChevronRight size="1.5em" onClick={() => onSwipe(1)} />
+            <ChevronRight size="1.8em" onClick={() => onSwipe(1)} />
           </ToolbarIcnBtn>
         </div>
       </div>
