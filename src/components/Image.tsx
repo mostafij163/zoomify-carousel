@@ -50,7 +50,7 @@ const Image = forwardRef(({ style }: { style: ImageSpring }, ref: Ref<{ resize: 
       modifierKey: null,
       rubberband: false,
       scaleBounds: { min: 1, max: maxScale },
-      from: () => [style.scale.get() / 2, 0],
+      from: () => [style.scale.get(), 0],
     },
     drag: {
       pointer: {
