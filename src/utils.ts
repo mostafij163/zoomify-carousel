@@ -17,6 +17,7 @@ export function measureContainedSize(
 export function resizeImage(imgUrl: string, width: number): string {
   const url = new URL(imgUrl)
   url.searchParams.set('w', `${Math.ceil(calcResponsiveWidth(width))}`)
+  url.searchParams.set('q', '100')
 
   return url.toString()
 }

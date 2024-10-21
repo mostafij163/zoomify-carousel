@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { ForwardedRef, forwardRef, MutableRefObject, Ref, RefObject, useImperativeHandle, useRef } from 'react'
 import useMeasure from 'react-use-measure'
 import { mergeRefs } from 'react-merge-refs'
 import { animated, to } from '@react-spring/web'
@@ -9,11 +9,11 @@ import useImgDrag from '../hooks/useImgDrag'
 import useImgPinch from '../hooks/useImgPinch'
 import useImgPinchEnd from '../hooks/useImgPinchEnd'
 import useCarousel from '../context/Carousel'
-import { calcActualWidth } from '../utils'
+import { calcActualWidth, resizeImage } from '../utils'
 
 const useGesture = createUseGesture([dragAction, pinchAction, wheelAction])
 
-export default function Image({ style }: { style: ImageSpring }) {
+const Image = forwardRef(({ style }: { style: ImageSpring }, ref: Ref<{ resize: () => void }>) => {
   const {
     image: { src, maxWidth, containedWidth, aspectRatio },
   } = useCarousel()
@@ -21,6 +21,21 @@ export default function Image({ style }: { style: ImageSpring }) {
   const imgRef = useRef<HTMLImageElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [measureRef, containerRect] = useMeasure()
+
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        resize() {
+          if (imgRef.current) {
+            const newSrc = resizeImage(imgRef.current.src, containerRect.width)
+            imgRef.current.src = newSrc
+          }
+        },
+      }
+    },
+    [containerRect]
+  )
 
   const onDrag = useImgDrag({ containerRect })
   const onPinch = useImgPinch({ containerRect })
@@ -76,4 +91,6 @@ export default function Image({ style }: { style: ImageSpring }) {
       />
     </animated.div>
   )
-}
+})
+
+export default Image

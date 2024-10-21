@@ -1,6 +1,6 @@
 import useMeasure from 'react-use-measure'
 import { useIsomorphicLayoutEffect, useSpring } from '@react-spring/web'
-import { useEffect, useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import Image from './Image'
 import Topbar from './Topbar'
@@ -19,6 +19,7 @@ import {
 } from '../utils'
 
 export default function Carousel({ images, index }: { images: Images; index: number }) {
+  const imgRef = useRef<{ resize: () => void }>(null)
   const [bodyRef, bodyRect] = useMeasure()
   const [topbarRect, setTopbarRect] = useState<Rect>({
     left: 0,
@@ -163,9 +164,9 @@ export default function Carousel({ images, index }: { images: Images; index: num
           <div className="flex-1 bg-slate-900 relative h-full w-full">
             <Topbar setIsOpen={setIsSidebarOpen} setRect={topbarCallback} />
             <div ref={bodyRef} className="w-full h-full relative">
-              <Image style={spring} />
+              <Image style={spring} ref={imgRef} />
             </div>
-            <Bottombar setRect={bottombarCallback} />
+            <Bottombar setRect={bottombarCallback} resizeImg={imgRef.current?.resize} />
           </div>
         </div>
       </div>

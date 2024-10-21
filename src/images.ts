@@ -12,23 +12,18 @@ export const images: Images = [
     height: 7506.3804,
   },
   {
-    src: 'https://plus.unsplash.com/premium_photo-1681406994530-3de7406c21a5?q=80&w=1974&auto=format',
+    src: 'https://images.unsplash.com/photo-1723110568223-f83071ddd4e5?q=80&w=1974&auto=format',
     width: 5000,
-    height: 7507.5075,
+    height: 3745.7627,
   },
   {
-    src: 'https://plus.unsplash.com/premium_photo-1727256511518-26b04624200d?q=80&w=1635&auto=format',
+    src: 'https://images.unsplash.com/photo-1729023169209-d75a85066ea2?q=80&w=2070&auto=format',
     width: 5000,
-    height: 6671.5591,
+    height: 3330.5085,
   },
   {
-    src: 'https://images.unsplash.com/photo-1726674472959-2c1c6c6ce8ae?q=80&w=1740&auto=format',
+    src: 'https://images.unsplash.com/photo-1728233363803-88a1226bf91d?q=80&w=1886&auto=format',
     width: 5000,
-    height: 3333.3333,
-  },
-  {
-    src: 'https://plus.unsplash.com/premium_photo-1676139292936-a2958a0d7177?q=80&w=1918&auto=format',
-    width: 5000,
-    height: 2195.4887,
+    height: 7519.2802,
   },
 ]

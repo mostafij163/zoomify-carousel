@@ -8,7 +8,7 @@ import ToolbarIcnBtn from './ToolbarIcnBtn'
 import useCarousel from '../context/Carousel'
 import { calcActualWidth, getSlideIndex } from '../utils'
 
-export default function Bottombar({ setRect }: { setRect: setRect }) {
+export default function Bottombar({ setRect, resizeImg }: { setRect: setRect; resizeImg?: () => void }) {
   const [bottombarRef, bottombarRect] = useMeasure()
   const { springApi, bodyRect, topbarRect, totalImages, image, currentIndex, setCurrentIndex, zoom, setZoom } =
     useCarousel()
@@ -51,7 +51,7 @@ export default function Bottombar({ setRect }: { setRect: setRect }) {
         </ToolbarIcnBtn>
         <div className="flex justify-start items-center gap-1  basis-full min-w-36 max-w-48 text-lg">
           <ZoomIn size="2.3em" />
-          <Slider min={1} max={100} value={[zoom]} step={1} onValueChange={onZoomChange} />
+          <Slider min={1} max={100} value={[zoom]} step={1} onValueChange={onZoomChange} onValueCommit={resizeImg} />
           <span>{Math.min(100, Math.round(zoom))}%</span>
         </div>
       </div>
