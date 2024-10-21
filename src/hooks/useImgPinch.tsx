@@ -18,6 +18,8 @@ export default function useImgPinch({ containerRect }: { containerRect: Rect }) 
   }) {
     const { top, left } = containerRect
 
+    // console.log('firing', s)
+
     if (first) {
       memo = {
         x: left,

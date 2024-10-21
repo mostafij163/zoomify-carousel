@@ -47,10 +47,12 @@ const Image = forwardRef(({ style }: { style: ImageSpring }, ref: Ref<{ resize: 
     target: containerRef,
     eventOptions: { passive: false },
     pinch: {
+      axis: 'lock',
       modifierKey: null,
       rubberband: false,
-      scaleBounds: { min: 1, max: maxScale },
+      pointer: { touch: true },
       from: () => [style.scale.get(), 0],
+      scaleBounds: { min: 1, max: maxScale },
     },
     drag: {
       pointer: {
