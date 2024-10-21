@@ -1,17 +1,17 @@
-import { ForwardedRef, forwardRef, MutableRefObject, Ref, RefObject, useImperativeHandle, useRef } from 'react'
 import useMeasure from 'react-use-measure'
 import { mergeRefs } from 'react-merge-refs'
 import { animated, to } from '@react-spring/web'
-import { createUseGesture, dragAction, pinchAction, UserGestureConfig, wheelAction } from '@use-gesture/react'
+import { forwardRef, Ref, useImperativeHandle, useRef } from 'react'
+import { createUseGesture, dragAction, pinchAction, UserGestureConfig } from '@use-gesture/react'
 
-import { ImageProps, ImageSpring } from '../types/types'
+import { ImageSpring } from '../types/types'
 import useImgDrag from '../hooks/useImgDrag'
+import useCarousel from '../context/Carousel'
 import useImgPinch from '../hooks/useImgPinch'
 import useImgPinchEnd from '../hooks/useImgPinchEnd'
-import useCarousel from '../context/Carousel'
 import { calcActualWidth, resizeImage } from '../utils'
 
-const useGesture = createUseGesture([dragAction, pinchAction, wheelAction])
+const useGesture = createUseGesture([dragAction, pinchAction])
 
 const Image = forwardRef(({ style }: { style: ImageSpring }, ref: Ref<{ resize: () => void }>) => {
   const {
@@ -50,7 +50,7 @@ const Image = forwardRef(({ style }: { style: ImageSpring }, ref: Ref<{ resize: 
       modifierKey: null,
       rubberband: false,
       scaleBounds: { min: 1, max: maxScale },
-      from: () => [style.scale.get(), 0],
+      from: () => [style.scale.get() / 2, 0],
     },
     drag: {
       pointer: {
