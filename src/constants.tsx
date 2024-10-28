@@ -6,3 +6,5 @@ export const springConfig1: SpringConfig = {
   bounce: 0,
   velocity: 0,
 }
+
+export const resolutions = [600, 1200, 1800, 2400, 3000, 3600, 4200]

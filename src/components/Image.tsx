@@ -28,7 +28,7 @@ const Image = forwardRef(({ style }: { style: ImageSpring }, ref: Ref<{ resize: 
       return {
         resize() {
           if (imgRef.current) {
-            const newSrc = resizeImage(imgRef.current.src, containerRect.width)
+            const newSrc = resizeImage(imgRef.current.src, containerRect.width, maxWidth)
             imgRef.current.src = newSrc
           }
         },

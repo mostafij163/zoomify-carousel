@@ -105,7 +105,7 @@ export default function Carousel({ images, index }: { images: Images; index: num
         aspectRatio,
         maxWidth: img.width,
         containedWidth: width,
-        src: resizeImage(img.src, width),
+        src: resizeImage(img.src, width, img.width),
       }
 
       setZoomLevel(calcZoomPercent(width, img.width))

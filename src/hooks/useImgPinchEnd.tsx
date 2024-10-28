@@ -3,6 +3,7 @@ import { RefObject, useCallback } from 'react'
 
 import { Rect } from '../types/types'
 import { resizeImage } from '../utils'
+import useCarousel from '../context/Carousel'
 
 export default function useImgPinchEnd({
   imgRef,
@@ -11,11 +12,14 @@ export default function useImgPinchEnd({
   imgRef: RefObject<HTMLImageElement>
   containerRect: Rect
 }) {
+  const {
+    image: { maxWidth },
+  } = useCarousel()
   return useCallback<Handler<'pinch'>>(
     function onPinchEnd() {
       if (imgRef.current) {
         const { width } = containerRect
-        const newSrc = resizeImage(imgRef.current.src, width)
+        const newSrc = resizeImage(imgRef.current.src, width, maxWidth)
         imgRef.current.src = newSrc
       }
     },
