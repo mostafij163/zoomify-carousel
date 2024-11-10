@@ -13,13 +13,13 @@ export default function useImgPinchEnd({
   containerRect: Rect
 }) {
   const {
-    image: { maxWidth },
+    image: { maxWidth, thumbnails },
   } = useCarousel()
   return useCallback<Handler<'pinch'>>(
     function onPinchEnd() {
       if (imgRef.current) {
         const { width } = containerRect
-        const newSrc = resizeImage(imgRef.current.src, width, maxWidth)
+        const newSrc = resizeImage(thumbnails, width, maxWidth)
         imgRef.current.src = newSrc
       }
     },

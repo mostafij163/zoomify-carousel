@@ -54,6 +54,7 @@ export default function Carousel({ images, index }: { images: Images; index: num
       y: 0,
       scale: 0,
     },
+    thumbnails: [],
   })
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
@@ -88,7 +89,7 @@ export default function Carousel({ images, index }: { images: Images; index: num
 
     if (imgViewport.height > 0) {
       const img = images[currentIndex]
-      const aspectRatio = img.width / img.height
+      const aspectRatio = img.dimension.width / img.dimension.height
 
       const [width, height] = measureContainedSize(imgViewport, aspectRatio)
 
@@ -103,12 +104,13 @@ export default function Carousel({ images, index }: { images: Images; index: num
           },
         },
         aspectRatio,
-        maxWidth: img.width,
+        maxWidth: img.thumbnails[img.thumbnails.length - 1].width,
         containedWidth: width,
-        src: resizeImage(img.src, width, img.width),
+        src: resizeImage(img.thumbnails, width, img.thumbnails[img.thumbnails.length - 1].width),
+        thumbnails: img.thumbnails,
       }
 
-      setZoomLevel(calcZoomPercent(width, img.width))
+      setZoomLevel(calcZoomPercent(width, config.maxWidth))
       setImage(config)
     }
   }, [bodyRect, topbarRect, bottombarRect, images, currentIndex, setZoomLevel])
@@ -156,6 +158,7 @@ export default function Carousel({ images, index }: { images: Images; index: num
           aspectRatio: image.aspectRatio,
           maxWidth: image.maxWidth,
           containedWidth: image.containedWidth,
+          thumbnails: image.thumbnails,
         },
       }}>
       <div className="h-screen w-screen overflow-hidden">
@@ -164,7 +167,7 @@ export default function Carousel({ images, index }: { images: Images; index: num
           <div className="flex-1 bg-slate-900 relative h-full w-full">
             <Topbar setIsOpen={setIsSidebarOpen} setRect={topbarCallback} />
             <div ref={bodyRef} className="w-full h-full relative">
-              <Image style={spring} ref={imgRef} />
+              <Image style={spring} ref={imgRef} thumbnails={image.thumbnails} />
             </div>
             <Bottombar setRect={bottombarCallback} resizeImg={imgRef.current?.resize} />
           </div>

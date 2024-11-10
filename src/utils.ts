@@ -1,6 +1,7 @@
 import clsx, { ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { resolutions } from './constants'
+import { Thumbnail } from './types/types'
 
 export const calcResponsiveWidth = (width: number) => width * (devicePixelRatio || 1)
 
@@ -15,21 +16,12 @@ export function measureContainedSize(
 }
 
 /*resize image width based on container size*/
-export function resizeImage(imgUrl: string, width: number, maxWidth: number): string {
-  const resolution = resolutions.find(r => {
-    return r >= calcResponsiveWidth(Math.floor(width))
+export function resizeImage(thumbnails: Thumbnail[], width: number, maxWidth: number): string {
+  const thumbnail = thumbnails.find(img => {
+    return img.width > calcResponsiveWidth(Math.floor(width))
   })
 
-  const url = new URL(imgUrl)
-
-  url.pathname = url.pathname.replace(/_w_\d+/, `_w_${Math.min(resolution!, maxWidth)}`)
-
-  return url.toString()
-  // const url = new URL(imgUrl)
-  // url.searchParams.set('w', `${Math.ceil(calcResponsiveWidth(width))}`)
-  // url.searchParams.set('q', '100')
-
-  // return url.toString()
+  return `https://ymagy.s3.eu-central-1.amazonaws.com/${thumbnail?.url}`
 }
 
 export function mergeClasses(...classes: ClassValue[]): string {

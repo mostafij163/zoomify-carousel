@@ -3,10 +3,17 @@ import { Vector2 } from '@use-gesture/react'
 import { SpringConfig, SpringRef, SpringValues } from '@react-spring/web'
 import { ClassValue } from 'clsx'
 
-export type Images = {
-  src: string
+export type Thumbnail = {
+  url: string
   width: number
   height: number
+}
+
+export type Images = {
+  id: string
+  name: string
+  dimension: { width: number; height: number }
+  thumbnails: Thumbnail[]
 }[]
 
 export type PinchMemo = {
@@ -41,6 +48,7 @@ export type ImageProps = Pick<HTMLImageElement, 'src'> & {
   maxWidth: number
   containedWidth: number
   aspectRatio: number
+  thumbnails: Thumbnail[]
 }
 
 export type ContainedImage = ImageProps & { springValues: ImageSpringProps }
