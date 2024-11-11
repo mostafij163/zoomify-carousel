@@ -3,6 +3,8 @@ import { twMerge } from 'tailwind-merge'
 import { resolutions } from './constants'
 import { Thumbnail } from './types/types'
 
+export const cdn = 'https://ymagy.s3.eu-central-1.amazonaws.com/'
+
 export const calcResponsiveWidth = (width: number) => width * (devicePixelRatio || 1)
 
 export const calcActualWidth = (responsiveWidth: number) => responsiveWidth / devicePixelRatio || 1
@@ -21,7 +23,7 @@ export function resizeImage(thumbnails: Thumbnail[], width: number, maxWidth: nu
     return img.width > calcResponsiveWidth(Math.floor(width))
   })
 
-  return `https://ymagy.s3.eu-central-1.amazonaws.com/${thumbnail?.url}`
+  return `${cdn}${thumbnail?.url}`
 }
 
 export function mergeClasses(...classes: ClassValue[]): string {

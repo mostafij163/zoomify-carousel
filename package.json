@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.tsx",
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-slider": "^1.2.0",
     "@react-spring/web": "^9.4.5",
     "@use-gesture/react": "latest",

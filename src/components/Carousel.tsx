@@ -18,7 +18,15 @@ import {
   resizeImage,
 } from '../utils'
 
-export default function Carousel({ images, index }: { images: Images; index: number }) {
+export default function Carousel({
+  images,
+  index,
+  onClose,
+}: {
+  images: Images
+  index: number
+  onClose: React.Dispatch<React.SetStateAction<boolean>>
+}) {
   const imgRef = useRef<{ resize: () => void }>(null)
   const [bodyRef, bodyRect] = useMeasure()
   const [topbarRect, setTopbarRect] = useState<Rect>({
@@ -78,6 +86,9 @@ export default function Carousel({ images, index }: { images: Images; index: num
         break
       case 'ArrowDown':
         setCurrentIndex(getSlideIndex(currentIndex, -1, images.length))
+        break
+      case 'Escape':
+        onClose(false)
         break
       default:
         break
@@ -165,7 +176,7 @@ export default function Carousel({ images, index }: { images: Images; index: num
         <div className="flex h-full">
           <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
           <div className="flex-1 bg-slate-900 relative h-full w-full">
-            <Topbar setIsOpen={setIsSidebarOpen} setRect={topbarCallback} />
+            <Topbar setIsOpen={setIsSidebarOpen} setRect={topbarCallback} onClose={onClose} />
             <div ref={bodyRef} className="w-full h-full relative">
               <Image style={spring} ref={imgRef} thumbnails={image.thumbnails} />
             </div>
